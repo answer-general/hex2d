@@ -8,7 +8,8 @@ public:
     MoveRight,
     MoveUp,
     MoveDown,
-    BombPlant
+    BombPlant,
+    NoCommand
   };
 
   InputMethod() {};
