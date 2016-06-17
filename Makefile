@@ -29,7 +29,7 @@ compile: $(TARGET)/$(EXEC)
 
 $(TARGET)/$(EXEC): $(OBJECTS)
 	mkdir -p $(TARGET)
-	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(TARGET)/$(EXEC)
+	$(CXX) $(OBJECTS) -o $(TARGET)/$(EXEC) $(LDFLAGS)
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
