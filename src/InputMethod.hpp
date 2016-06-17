@@ -20,6 +20,8 @@ public:
   virtual ~InputMethod() {};
 
   virtual enum Command getNextCommand() = 0;
+
+  virtual void update() = 0;
 };
 
 #endif
