@@ -13,6 +13,7 @@ SOURCES=$(addprefix src/, \
   Config.cpp \
   screens/MainMenu.cpp \
   screens/LevelSelect.cpp \
+  screens/MapView.cpp \
   screens/GameScreen.cpp \
   UI.cpp \
   KeyboardInput.cpp \
