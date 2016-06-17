@@ -57,7 +57,11 @@ UI::UI(Game& g) : d(new Private(g)) {
 
 UI::~UI() {}
 
-void UI::update(int kbdIn) {
+void UI::update() {
+  // Peek at the keyboard input.
+  int kbdIn = getch();
+  ungetch(kbdIn);
+
   d->screens[d->currentScreen].screen->handleInput(kbdIn);
   d->screens[d->currentScreen].screen->draw();
   update_panels();

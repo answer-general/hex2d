@@ -21,7 +21,7 @@ public:
 
   ~UI();
 
-  void update(int kbdIn);
+  void update();
 
   void switchScreen(enum ScreenType);
 private:

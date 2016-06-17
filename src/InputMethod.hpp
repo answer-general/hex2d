@@ -6,13 +6,13 @@ public:
   enum Command {
     MoveUp,
     MoveRight,
-    MoveUp,
     MoveDown,
+    MoveLeft,
     BombPlant,
     NoCommand
   };
 
-  InputMethod() {};
+  InputMethod(int id) : target(id) {};
 
   InputMethod(const InputMethod&) = delete;
   InputMethod& operator =(const InputMethod&) = delete;
@@ -22,6 +22,8 @@ public:
   virtual enum Command getNextCommand() = 0;
 
   virtual void update() = 0;
+protected:
+  int target;
 };
 
 #endif

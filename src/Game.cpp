@@ -25,9 +25,10 @@ Game::Game() : d(new Private()) {
 Game::~Game() {}
 
 void Game::update() {
-  int kbdIn = getch();
-
-  d->ui->update(kbdIn);
+  d->ui->update();
+  
+  // Discard symbol at keyboard input.
+  getch();
 }
 
 bool Game::isRunning() const {

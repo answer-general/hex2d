@@ -15,6 +15,7 @@ SOURCES=$(addprefix src/, \
   screens/LevelSelect.cpp \
   screens/GameScreen.cpp \
   UI.cpp \
+  KeyboardInput.cpp \
   ActorMage.cpp \
   Game.cpp \
   main.cpp \
