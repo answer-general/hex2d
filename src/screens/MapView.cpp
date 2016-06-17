@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include "MapView.hpp"
 
 class MapView::Private {

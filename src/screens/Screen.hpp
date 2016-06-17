@@ -2,7 +2,7 @@
 #define SCREEN_H
 
 #include "../commons.hpp"
-#include <curses.h>
+#include <ncurses.h>
 
 const int UP_CODE = KEY_UP;
 const int DOWN_CODE = KEY_DOWN;

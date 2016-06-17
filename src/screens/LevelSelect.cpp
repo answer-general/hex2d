@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include <menu.h>
 #include <panel.h>
 #include <string>

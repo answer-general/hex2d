@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include "Game.hpp"
 #include "ObjectContainer.hpp"
 #include "Level.hpp"

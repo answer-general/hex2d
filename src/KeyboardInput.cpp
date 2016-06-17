@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include "Config.hpp"
 #include "Game.hpp"
 #include "KeyboardInput.hpp"

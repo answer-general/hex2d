@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include <panel.h>
 #include "../Game.hpp"
 #include "GameScreen.hpp"

@@ -1,7 +1,7 @@
 #ifndef MAP_VIEW_HPP
 #define MAP_VIEW_HPP
 
-#include <curses.h>
+#include <ncurses.h>
 #include "../commons.hpp"
 
 class Game;
