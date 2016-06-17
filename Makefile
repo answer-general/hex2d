@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS+=-Wall -pedantic -Wno-long-long -O0 -std=c++11 -g
-LDFLAGS=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -g
+LDFLAGS=-O0 -std=c++11 -lncurses -ltinfo -lmenu -lpanel -g
 
 TARGET=./titovden
 SRCDIR=./src
@@ -29,7 +29,7 @@ compile: $(TARGET)/$(EXEC)
 
 $(TARGET)/$(EXEC): $(OBJECTS)
 	mkdir -p $(TARGET)
-	$(CXX) $(LDFLAGS) $(OBJECTS) -o $(TARGET)/$(EXEC)
+	$(CXX) $(OBJECTS) -o $(TARGET)/$(EXEC) $(LDFLAGS)
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
