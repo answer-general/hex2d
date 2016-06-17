@@ -9,21 +9,23 @@ class InputMethod;
 
 class Actor : public GameObject {
 public:
-  Actor(Game&);
+  Actor(int id) : GameObject(id) {};
 
   Actor(const Actor&) = delete;
   Actor& operator =(const Actor&) = delete;
 
-  ~Actor();
+  virtual ~Actor() {};
 
-  void setInputMethod(SPtr<InputMethod>);
+  virtual void setInputMethod(SPtr<InputMethod> in) { input = in; };
 
-  void update();
+  virtual void update() = 0;
+  
+  virtual bool explodable() const { return true; };
+  virtual bool passable() const { return false; };
 
   // Property modificators for bonuses.
-private:
-  class Private;
-  UPtr<Private> d;
+protected:
+  SPtr<InputMethod> input;
 };
 
 #endif
