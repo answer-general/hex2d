@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS+=-Wall -pedantic -Wno-long-long -O0 -std=c++11 -g
-LDFLAGS=-O0 -std=c++11 -lcurses -lmenu -lpanel -g
+LDFLAGS=-O0 -std=c++11 -lncurses -lmenu -lpanel -g
 
 TARGET=./titovden
 SRCDIR=./src
