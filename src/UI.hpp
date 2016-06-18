@@ -10,6 +10,7 @@ public:
   enum ScreenType {
     MainMenuScreen,
     LevelSelSingle,
+    GameSingle,
     ScreensCount,
     NoScreen // Signals shutdown.
   };

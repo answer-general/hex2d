@@ -20,6 +20,8 @@ Game::Game() : d(new Private()) {
   d->gameObjects.reset(new ObjectContainer());
   d->config.reset(new Config());
   d->ui.reset(new UI(*this));
+
+  d->loadedLevel.reset(new Level(*this));
 }
 
 Game::~Game() {}

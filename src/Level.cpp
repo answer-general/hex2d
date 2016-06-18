@@ -1,15 +1,16 @@
+#include "Config.hpp"
+#include "Game.hpp"
 #include "Level.hpp"
 #include "Tiles.hpp"
 #include "ObjectContainer.hpp"
 #include <algorithm>
 #include <stdexcept>
 #include <stdio.h>
-#include <stdlib.h> // Temporary
 #include <vector>
 
 class Level::Private {
 public:
-  Private(WPtr<ObjectContainer> repo) : repo(repo),
+  Private(Game& c) : core(c),
     size(0, 0), field(), spawns(), spawnsUsed(0), objects() {};
 
   bool levelSizeFromFile(FILE* in);
@@ -17,7 +18,8 @@ public:
   int& fieldAt(const Point&);
   const int& fieldAt(const Point&) const;
 
-  SPtr<ObjectContainer> repo;
+  Game& core;
+
   Point size;
   std::vector<int> field;
 
@@ -35,7 +37,7 @@ public:
   std::vector<Cell> objects;
 };
 
-Level::Level(SPtr<ObjectContainer> repo) : d(new Private(repo)) {
+Level::Level(Game& core) : d(new Private(core)) {
 }
 
 Level::~Level() {
@@ -71,7 +73,7 @@ bool Level::moveTo(int id, const Point& pos) {
     return false;
   
   try {
-    d->repo->getObject(id);
+    d->core.getObjects()->getObject(id);
   } catch (const std::out_of_range&) {
     return false;
   };
@@ -106,7 +108,7 @@ bool Level::placeAt(int id, const Point& pos) {
     return false;
 
   try {
-    d->repo->getObject(id);
+    d->core.getObjects()->getObject(id);
   } catch (const std::out_of_range&) {
     return false;
   };
@@ -129,9 +131,7 @@ bool Level::placeAt(int id, const Point& pos) {
 }
 
 bool Level::fromFile(const std::string& name) {
-  std::string path(getenv("HOME"));
-  path += "/.config/HexedMan/levels";
-
+  std::string path = d->core.getConfig()->getLevelsPath();
   path += name;
   path += ".hml";
 
@@ -151,6 +151,19 @@ bool Level::fromFile(const std::string& name) {
 
   fclose(in);
   return true;
+}
+
+void Level::reset() {
+  d->field.clear();
+  d->field.shrink_to_fit();
+  d->size = {0, 0};
+
+  d->spawns.clear();
+  d->spawns.shrink_to_fit();
+  d->spawnsUsed = 0;
+
+  d->objects.clear();
+  d->objects.shrink_to_fit();
 }
 
 bool Level::Private::levelSizeFromFile(FILE* in) {
@@ -174,6 +187,7 @@ bool Level::Private::levelSizeFromFile(FILE* in) {
 
 bool Level::Private::fieldFromFile(FILE* in) {
   field.reserve(size.x * size.y);
+  field.resize(size.x * size.y, 0);
 
   // Get tiles.
   int wood = GameObject::TileWood;

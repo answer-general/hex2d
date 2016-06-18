@@ -8,14 +8,14 @@ class Game;
 
 class MapView {
 public:
-  MapView(Game& core, WINDOW* origin = nullptr);
+  MapView(Game& core, WINDOW* viewport = nullptr);
 
   MapView(const MapView&) = delete;
   MapView& operator =(const MapView&) = delete;
 
   ~MapView();
 
-  void setOrigin(WINDOW* origin);
+  void setViewport(WINDOW* viewport);
 
   void update();
 private:

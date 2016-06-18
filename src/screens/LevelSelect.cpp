@@ -6,6 +6,7 @@
 #include "../Game.hpp"
 #include "../Config.hpp"
 #include "../FileHelper.hpp"
+#include "../Level.hpp"
 #include "../UI.hpp"
 #include "LevelSelect.hpp"
 
@@ -77,7 +78,12 @@ void LevelSelect::Private::createMenu() {
 }
 
 void LevelSelect::Private::selectItem(int idx) {
+  if (entries[idx] != nullptr) { // Existing element selected.
+    // Setup new game session. Need to move this to engine.
+    core.getLevel()->fromFile(levelNames[idx]);
 
+    core.getUI()->switchScreen(UI::GameSingle);
+  }
 }
 
 LevelSelect::LevelSelect(Game& core) : d(new Private(core)) {

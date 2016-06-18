@@ -1,59 +1,63 @@
 #include <ncurses.h>
+#include <map>
+
+#include "../Game.hpp"
+#include "../GameObject.hpp"
+#include "../Level.hpp"
 #include "MapView.hpp"
 
 class MapView::Private {
 public:
-  Private(Game& c) : core(c) {};
+  Private(Game& c, WINDOW* vp) : core(c), viewport(vp) {};
+  static int getSymbol(int id);
   void printLevelMap();
 
   Game& core;
-  WINDOW* origin;
-
-  WINDOW* displayArea;
+  WINDOW* viewport;
 };
 
+int MapView::Private::getSymbol(int id) {
+  int res;
+  if (id == GameObject::TileWood)
+    res = '+';
+  else if (id == GameObject::TileStone)
+    res = '#';
+  else if (id == GameObject::TileFloor)
+    res = ' ';
+  else
+    res = '?';
+
+  return res;
+}
+
 void MapView::Private::printLevelMap() {
+  const SPtr<Level> field = core.getLevel();
 
-}
+  Point portSize;
+  getmaxyx(viewport, portSize.y, portSize.x);
 
-MapView::MapView(Game& core, WINDOW* origin) : d(new Private(core)) {
-  d->origin = origin;
+  Point fieldSize = field->getSize();
 
-  if (d->origin) { // Create pad, if possible.
-    int y, x;
-    getmaxyx(d->origin, y, x);
-
-    d->displayArea = subpad(d->origin, y, x, 0, 0);
-  } else {
-    d->displayArea = nullptr;
+  Point pos;
+  for (pos.y = 0; pos.y < portSize.x && pos.y < fieldSize.y; ++pos.y) {
+    for (pos.x = 0; pos.x < portSize.x && pos.x < fieldSize.x; ++pos.x) {
+      int ch = getSymbol(field->getObjectAt(pos));
+      mvwaddch(viewport, pos.y, pos.x, ch);
+    }
   }
 }
 
-MapView::~MapView() {
-  delwin(d->displayArea);
-}
+MapView::MapView(Game& core, WINDOW* vp) : d(new Private(core, vp)) {}
 
-void MapView::setOrigin(WINDOW* origin) {
-  if (origin) {
-    delwin(d->displayArea);
+MapView::~MapView() {}
 
-    d->origin = origin;
-
-    int y, x;
-    getmaxyx(d->origin, y, x);
-
-    d->displayArea = subpad(d->origin, y, x, 0, 0);
-  }
+void MapView::setViewport(WINDOW* vp) {
+  d->viewport = vp;
 }
 
 void MapView::update() {
-  if (d->displayArea) {
+  if (d->viewport) {
     d->printLevelMap();
-
-    // Print pad segment to window.
-    int y, x;
-    getmaxyx(d->origin, y, x);
-    // TODO: tie parameters 3 and 4 to tracked character.
-    pnoutrefresh(d->displayArea, 0, 0, 0, 0, y, x);
+    wnoutrefresh(d->viewport);
   }
 }

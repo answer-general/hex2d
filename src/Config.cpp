@@ -18,7 +18,7 @@ Config::Config() : d(new Private()) {
 Config::~Config() {}
 
 std::string Config::getLevelsPath() const {
-  return d->resDir + "/levels";
+  return d->resDir + "/levels/";
 }
 
 enum InputMethod::Command Config::getKbdCommand(int playerId, int key) {

@@ -3,6 +3,7 @@
 #include "UI.hpp"
 #include "Game.hpp"
 #include "screens/Screen.hpp"
+#include "screens/GameScreen.hpp"
 #include "screens/MainMenu.hpp"
 #include "screens/LevelSelect.hpp"
 
@@ -44,13 +45,22 @@ UI::UI(Game& g) : d(new Private(g)) {
     onLevelSelSingleExit,
     levelSelector
   };
-  
-  d->screens[(int)mainMenu.type] = mainMenu;
-  d->screens[(int)levelSelSingle.type] = levelSelSingle;
+
+  SPtr<Screen> gameScreen(new GameScreen(d->game));
+  Private::Transition singleGame = {
+    UI::GameSingle,
+    nullptr,
+    nullptr,
+    gameScreen
+  };
+
+  d->screens[mainMenu.type] = mainMenu;
+  d->screens[levelSelSingle.type] = levelSelSingle;
+  d->screens[singleGame.type] = singleGame;
 
   d->currentScreen = mainMenu.type;
 
-  d->screens[(int)d->currentScreen].screen->draw();
+  d->screens[d->currentScreen].screen->draw();
   update_panels();
   doupdate();
 }
