@@ -13,7 +13,7 @@ public:
   SPtr<UI> ui;
   SPtr<Level> loadedLevel;
 
-  enum Game::State currentState;
+  bool isRunning;
 };
 
 Game::Game() : d(new Private()) {
@@ -22,6 +22,7 @@ Game::Game() : d(new Private()) {
   d->ui.reset(new UI(*this));
 
   d->loadedLevel.reset(new Level(*this));
+  d->isRunning = true;
 }
 
 Game::~Game() {}
@@ -34,11 +35,11 @@ void Game::update() {
 }
 
 bool Game::isRunning() const {
-  return (d->currentState != State::GameStopped);
+  return d->isRunning;
 }
 
-void Game::setState(enum State s) {
-  d->currentState = s;
+void Game::quit() {
+  d->isRunning = false;
 }
 
 SPtr<Config> Game::getConfig() {

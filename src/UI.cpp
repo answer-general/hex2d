@@ -80,7 +80,7 @@ void UI::update() {
 
 void UI::switchScreen(enum ScreenType target) {
   if (target == NoScreen) { // Request to shutdown.
-    d->game.setState(Game::GameStopped);
+    d->game.quit();
   } else { // Change screens.
     if (d->screens[d->currentScreen].onExit)
       d->screens[d->currentScreen].onExit(d->screens[d->currentScreen].screen.get());

@@ -10,12 +10,6 @@ class UI;
 
 class Game {
 public:
-  enum State {
-    SimulationStopped, // In menus, not running.
-    SimulationRunning, // In game.
-    GameStopped // Requested to finish.
-  };
-
   Game();
 
   Game(const Game&) = delete;
@@ -23,12 +17,11 @@ public:
 
   ~Game();
 
-  bool isRunning() const;
-
   /// Advance by one tick.
   void update();
 
-  void setState(enum State);
+  bool isRunning() const;
+  void quit();
 
   // Component access
   SPtr<Config> getConfig();
