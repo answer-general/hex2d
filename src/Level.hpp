@@ -6,6 +6,33 @@
 
 class Game;
 
+class Cell {
+public:
+  Cell();
+
+  Cell(const Cell& o);
+  Cell& operator =(const Cell& o);
+
+  size_t size() const;
+
+  /// /return false if empty.
+  bool back(int& id) const;
+  /// /return false if empty.
+  bool pop();
+  /// /return false if full.
+  bool push(int id);
+
+  /// Searches for element inside.
+  /// /return -1 if id not found.
+  int find(int id) const;
+  bool erase(size_t idx);
+private:
+  static const size_t MaxObjects = 16;
+
+  int buffer[MaxObjects];
+  size_t used;
+};
+
 class Level {
 public:
   Level(Game& core);
@@ -17,12 +44,14 @@ public:
 
   const Point& getSize() const;
 
-  int getObjectAt(const Point& pos) const;
+  int getTopObjectAt(const Point& pos) const;
+  Cell getCellAt(const Point& pos) const;
 
   bool spawn(int objId);
   bool moveTo(int id, const Point& pos);
 
   bool placeAt(int id, const Point& pos);
+  bool placeAt(const Cell& group, const Point& pos);
 
   bool fromFile(const std::string& name);
   void reset();

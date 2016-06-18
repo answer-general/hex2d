@@ -6,12 +6,78 @@
 #include <algorithm>
 #include <stdexcept>
 #include <stdio.h>
+#include <utility>
 #include <vector>
+
+Cell::Cell() : used(0) {}
+
+Cell::Cell(const Cell& o) {
+  for (size_t i = 0; i < o.used; ++i)
+    buffer[i] = o.buffer[i];
+  used = o.used;
+}
+
+Cell& Cell::operator =(const Cell& o) {
+  for (size_t i = 0; i < o.used; ++i)
+    buffer[i] = o.buffer[i];
+  used = o.used;
+
+  return *this;
+}
+
+size_t Cell::size() const { return used; }
+
+bool Cell::back(int& res) const {
+  if (used == 0)
+    return false;
+
+  res = buffer[used-1];
+  return true;
+}
+
+bool Cell::push(int val) {
+  if (used == MaxObjects)
+    return false;
+
+  buffer[used++] = val;
+  return true;
+}
+
+bool Cell::pop() {
+  if (used == 0)
+    return false;
+
+  --used;
+  return true;
+}
+
+int Cell::find(int id) const {
+  size_t i;
+  for (i = 0; i < used; ++i)
+    if (buffer[i] == id)
+      break;
+
+  if (i == used)
+    return -1;
+
+  return i; 
+}
+
+bool Cell::erase(size_t idx) {
+  if (idx > used)
+    return false;
+
+  --used;
+  for (size_t i = idx; i < used - 1; ++i)
+    buffer[i] = buffer[i+1];
+
+  return true;
+}
 
 class Level::Private {
 public:
-  Private(Game& c) : core(c),
-    size(0, 0), field(), spawns(), spawnsUsed(0), objects() {};
+  Private(Game& c) : core(c), size(0, 0), field(),
+      spawns(), spawnsUsed(0), cells() {};
 
   bool levelSizeFromFile(FILE* in);
   bool fieldFromFile(FILE* in);
@@ -27,14 +93,8 @@ public:
   std::vector<Point> spawns;
   size_t spawnsUsed;
 
-  // For retaining backgrounds of cells under dynamic objects.
-  struct Cell {
-    int fore;
-    int back;
-    Point pos;
-  };
   // Efficient due to relatively small objects count.
-  std::vector<Cell> objects;
+  std::vector< std::pair< Cell, Point > > cells;
 };
 
 Level::Level(Game& core) : d(new Private(core)) {
@@ -48,11 +108,32 @@ const Point& Level::getSize() const {
   return d->size;
 }
 
-int Level::getObjectAt(const Point& pos) const {
-  if (pos.x > d->size.x || pos.y > d->size.y)
+int Level::getTopObjectAt(const Point& pos) const {
+  if (pos.x > d->size.x || pos.y > d->size.y) {
     return GameObject::InvalidObject;
+  }
 
-  return d->field[pos.y * d->size.x + pos.x];
+  return d->fieldAt(pos);
+}
+
+Cell Level::getCellAt(const Point& pos) const {
+  Cell res;
+  
+  if (pos.x > d->size.x || pos.y > d->size.y) {
+    res.push(GameObject::InvalidObject);
+  } else {
+    // Find if there are several objects in cell.
+    auto it = std::find_if(d->cells.begin(), d->cells.end(),
+        [pos](const std::pair<Cell, Point>& v)
+        { return v.second == pos; });
+
+    if (it != d->cells.end()) // Multiple objects found, copy cell.
+      res = it->first;
+    else // Only one object, take from field.
+      res.push(d->fieldAt(pos));
+  }
+
+  return res;
 }
 
 bool Level::spawn(int objId) {
@@ -79,27 +160,44 @@ bool Level::moveTo(int id, const Point& pos) {
   };
 
   // Remove id from previous cell.
-  { auto it = std::find_if(d->objects.begin(), d->objects.end(),
-      [id](const Private::Cell& v) { return v.fore == id; });
+  { auto it = std::find_if(d->cells.begin(), d->cells.end(),
+      [id](const std::pair<Cell, Point>& v)
+      { return v.first.find(id) != -1; });
 
-    if (it != d->objects.end()) {
-      d->fieldAt(it->pos) = it->back;
-      d->objects.erase(it);
+    // Id found.
+    if (it != d->cells.end()) {
+      // Take this element away.
+      int idx = it->first.find(id);
+      it->first.erase(idx);
+
+      // Restore top element.
+      it->first.back(d->fieldAt(it->second));
+
+      // Only one object left, no ambiguity.
+      if (it->first.size() == 1)
+        d->cells.erase(it);
     }
   }
 
-  // Save information about new cell.
-  { Private::Cell c;
-    c.fore = id;
-    c.back = d->fieldAt(pos);
-    c.pos = pos;
+  // Add id to the new cell.
+  { // Save current cell value.
+    auto it = std::find_if(d->cells.begin(), d->cells.end(),
+      [pos](const std::pair<Cell, Point>& v) { return v.second == pos; });
 
-    d->objects.push_back(c);
+    if (it == d->cells.end()) { // Cell not occupied, save info.
+      Cell c;
+      c.push(d->fieldAt(pos));
+      c.push(id);
+
+      d->cells.push_back(std::pair<Cell, Point>(c, pos));
+    } else { // Add id to the top.
+      if (!it->first.push(id))
+        return false;
+    }  
   }
 
-  // Add id to new cell.
+  // Place id on the field as well;
   d->fieldAt(pos) = id;
-
   return true; 
 }
 
@@ -114,19 +212,22 @@ bool Level::placeAt(int id, const Point& pos) {
   };
 
   // Save current cell value.
-  auto it = std::find_if(d->objects.begin(), d->objects.end(),
-      [pos](const Private::Cell& v) { return v.pos == pos; });
+  auto it = std::find_if(d->cells.begin(), d->cells.end(),
+      [pos](const std::pair<Cell, Point>& v) { return v.second == pos; });
 
-  if (it == d->objects.end()) { // Cell not occupied, save info.
-    Private::Cell c;
-    c.pos = pos;
-    c.back = d->fieldAt(pos);
-    it = d->objects.insert(d->objects.end(), c);
+  if (it == d->cells.end()) { // Cell not occupied, save info.
+    Cell c;
+    c.push(d->fieldAt(pos));
+    c.push(id);
+
+    d->cells.push_back(std::pair<Cell, Point>(c, pos));
+  } else { // Add id to the top.
+    if (!it->first.push(id))
+      return false;
   }
 
-  it->fore = id; // Overwrite current foreground.
+  // Place id on the field as well;
   d->fieldAt(pos) = id;
-
   return true;
 }
 
@@ -162,8 +263,8 @@ void Level::reset() {
   d->spawns.shrink_to_fit();
   d->spawnsUsed = 0;
 
-  d->objects.clear();
-  d->objects.shrink_to_fit();
+  d->cells.clear();
+  d->cells.shrink_to_fit();
 }
 
 bool Level::Private::levelSizeFromFile(FILE* in) {

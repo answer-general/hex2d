@@ -42,6 +42,8 @@ public:
 
   virtual bool explodable() const = 0;
   virtual bool passable() const = 0;
+
+  virtual void update() {};
 protected:
   int id;
 };

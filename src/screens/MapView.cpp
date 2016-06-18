@@ -41,7 +41,7 @@ void MapView::Private::printLevelMap() {
   Point pos;
   for (pos.y = 0; pos.y < portSize.x && pos.y < fieldSize.y; ++pos.y) {
     for (pos.x = 0; pos.x < portSize.x && pos.x < fieldSize.x; ++pos.x) {
-      int ch = getSymbol(field->getObjectAt(pos));
+      int ch = getSymbol(field->getTopObjectAt(pos));
       mvwaddch(viewport, pos.y, pos.x, ch);
     }
   }
