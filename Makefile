@@ -21,6 +21,7 @@ SOURCES=$(addprefix src/, \
   Engine.cpp \
   Game.cpp \
   main.cpp \
+	BSDSocket.cpp \
 )
 OBJECTS=$(SOURCES:.cpp=.o)
 
