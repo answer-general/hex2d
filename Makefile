@@ -20,6 +20,7 @@ SOURCES=$(addprefix src/, \
   ActorMage.cpp \
   Game.cpp \
   main.cpp \
+	BSDSocket.cpp \
 )
 OBJECTS=$(SOURCES:.cpp=.o)
 
