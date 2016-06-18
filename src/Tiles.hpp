@@ -5,7 +5,7 @@
 
 class WoodTile : public GameObject {
 public:
-  WoodTile() : GameObject((int)ObjectId::WoodTile) {};
+  WoodTile() : GameObject(GameObject::TileWood) {};
   ~WoodTile() {};
 
   bool explodable() const { return true; };
@@ -14,7 +14,7 @@ public:
 
 class StoneTile : public GameObject {
 public:
-  StoneTile() : GameObject((int)ObjectId::StoneTile) {};
+  StoneTile() : GameObject(GameObject::TileStone) {};
   ~StoneTile() {};
 
   bool explodable() const { return false; };
@@ -23,7 +23,7 @@ public:
 
 class FloorTile : public GameObject {
 public:
-  FloorTile() : GameObject((int)ObjectId::FloorTile) {};
+  FloorTile() : GameObject(GameObject::TileFloor) {};
   ~FloorTile() {};
 
   bool explodable() const { return false; };

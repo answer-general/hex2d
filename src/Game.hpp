@@ -4,6 +4,7 @@
 #include "commons.hpp"
 
 class Config;
+class Level;
 class ObjectContainer;
 class UI;
 
@@ -32,6 +33,9 @@ public:
   // Component access
   SPtr<Config> getConfig();
   const SPtr<Config> getConfig() const;
+
+  SPtr<Level> getLevel();
+  const SPtr<Level> getLevel() const;
 
   SPtr<ObjectContainer> getObjects();
   const SPtr<ObjectContainer> getObjects() const;

@@ -24,7 +24,7 @@ std::string Config::getLevelsPath() const {
 enum InputMethod::Command Config::getKbdCommand(int playerId, int key) {
   enum InputMethod::Command res;
   
-  if (playerId == (int)ObjectId::Player1) {
+  if (playerId == GameObject::ActorPlayer1) {
     switch (key) {
     // TODO: replace with configurable bindings.
     case 'W':

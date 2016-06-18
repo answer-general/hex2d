@@ -47,6 +47,14 @@ const SPtr<Config> Game::getConfig() const {
   return d->config;
 }
 
+SPtr<Level> Game::getLevel() {
+  return d->loadedLevel;
+}
+
+const SPtr<Level> Game::getLevel() const {
+  return d->loadedLevel;
+}
+
 SPtr<ObjectContainer> Game::getObjects() {
   return d->gameObjects;
 }

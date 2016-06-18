@@ -48,7 +48,7 @@ const Point& Level::getSize() const {
 
 int Level::getObjectAt(const Point& pos) const {
   if (pos.x > d->size.x || pos.y > d->size.y)
-    return (int)ObjectId::InvalidObject;
+    return GameObject::InvalidObject;
 
   return d->field[pos.y * d->size.x + pos.x];
 }
@@ -176,9 +176,9 @@ bool Level::Private::fieldFromFile(FILE* in) {
   field.reserve(size.x * size.y);
 
   // Get tiles.
-  int wood = (int)ObjectId::WoodTile;
-  int stone = (int)ObjectId::StoneTile;
-  int floor = (int)ObjectId::FloorTile;
+  int wood = GameObject::TileWood;
+  int stone = GameObject::TileStone;
+  int floor = GameObject::TileFloor;
 
   Point read = { 0, 0 };
 
