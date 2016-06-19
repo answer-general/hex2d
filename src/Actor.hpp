@@ -20,13 +20,7 @@ public:
       input->assign(GameObject::InvalidObject);
   };
 
-  virtual void setInputMethod(SPtr<InputMethod> in) { input = in; };
-  
-  virtual bool explodable() const { return true; };
-  virtual bool passable() const { return false; };
-
-  // Behaviour modification.
-  virtual void explode() = 0;
+  virtual void setInputMethod(SPtr<InputMethod> in) { input = in; }
 
   // Property modificators for bonuses.
   

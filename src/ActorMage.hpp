@@ -13,11 +13,15 @@ public:
 
   ~ActorMage();
 
+  int print() const;
+
+  Point pos() const;
+  bool move(const Point&);
+
+  bool alive() const;
+  bool kill();
+ 
   void update();
-
-  void explode();
-
-  bool isActive() const;
 private:
   class Private;
   UPtr<Private> d;

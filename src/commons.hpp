@@ -13,13 +13,14 @@ template <typename T>
 using WPtr = std::weak_ptr<T>;
 
 struct Point {
-  Point(size_t nx = 0, size_t ny = 0) : x(nx), y(ny) {};
+  Point(int nx = 0, int ny = 0) : x(nx), y(ny) {};
   bool operator <(const Point& o) const {
    return  (x < o.x) || (x == o.x && y < o.y); 
   };
-  bool operator ==(const Point& o) const { return (x == o.x) && (y == o.y); };
-  size_t x;
-  size_t y;
+  bool operator ==(const Point& o) const { return (!(*this < o) && !(o < *this)); };
+  bool operator !=(const Point& o) const { return !(*this == o); };
+  int x;
+  int y;
 };
 
 #endif

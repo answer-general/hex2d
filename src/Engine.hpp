@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include "commons.hpp"
+#include <string>
 
 class Game;
 
@@ -24,7 +25,6 @@ public:
 
   void run();
   void stop();
-  void restart();
 
   void update();
 
@@ -32,11 +32,14 @@ public:
   enum Mode getMode() const;
   void setMode(enum Mode);
 
+  const std::string& levelName() const;
+  void setLevelName(const std::string&);
+
   // Gameplay methods.
   // Explode everything in line from start to end or
   // until the first non-explodable cell. If start and
   // end are not on horizontal or vertical line -- fails.
-  bool explode(const Point& start, const Point& end);
+  bool explode(const Point& start, Point end);
 private:
   class Private;
   UPtr<Private> d;

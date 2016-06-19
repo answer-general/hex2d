@@ -50,9 +50,6 @@ GameScreen::~GameScreen() {
 void GameScreen::handleInput(int kbdIn) {
   switch (kbdIn) {
   case BACKSPACE_CODE:
-    // Stop game and go to main menu.
-    // Replace with engine's reset.
-    d->core.getLevel()->reset();
     d->core.getEngine()->stop();
     d->core.getUI()->switchScreen(UI::MainMenuScreen);
     break;

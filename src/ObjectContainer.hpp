@@ -2,6 +2,7 @@
 #define OBJECTCONTAINER_HPP
 
 #include "commons.hpp"
+#include <vector>
 
 class GameObject;
 
@@ -17,10 +18,12 @@ public:
 
   bool addObject(SPtr<GameObject>);
   bool removeObject(int id);
+  void clear();
+
   SPtr<GameObject> getObject(int id);
 
-  // Helper for global updating.
-  void updateAll();
+  std::vector<int> getAllIds() const;
+  std::vector<int> getIdsAt(const Point&) const;
 private:
   class Private;
   UPtr<Private> d;

@@ -1,108 +1,152 @@
+#include <vector>
 #include "ActorMage.hpp"
+#include "Bomb.hpp"
 #include "Game.hpp"
 #include "InputMethod.hpp"
+#include "ObjectContainer.hpp"
 #include "Level.hpp"
 
 class ActorMage::Private {
 public:
-  const double defaultSpeed = 0.25;
+  static const double defaultSpeed;
+  static const size_t defaultBombRadius;
+  static const size_t defaultBombCount;
 
-  Private(Game& c, ActorMage& self) : core(c), self(self), 
-      active(true), speed(defaultSpeed), tick(0) {};
-  void move(InputMethod::Command cmd);
+  Private(Game& c, ActorMage& self) : core(c), self(self),
+      speed(defaultSpeed), bombRadius(defaultBombRadius),
+      bombCount(defaultBombCount), alive(true), mortal(true),
+      bombs(), pos(-1,-1) {};
+
+  void checkBombs();
+  void onCmdMove(InputMethod::Command cmd);
+  void onCmdPlant();
 
   Game& core;
   ActorMage& self;
 
-  bool active;
   double speed;
-  size_t tick;
+  size_t bombRadius;
+  size_t bombCount;
+
+  bool alive;
+  bool mortal;
+  int tick; // For speed adjustments.
+  std::vector< SPtr<Bomb> > bombs;
+
+  Point pos;
 };
+
+const double ActorMage::Private::defaultSpeed = 0.5;
+const size_t ActorMage::Private::defaultBombRadius = 2;
+const size_t ActorMage::Private::defaultBombCount = 1;
 
 ActorMage::ActorMage(Game& core, int id) : Actor(id),
     d(new Private(core, *this)) {}
 
 ActorMage::~ActorMage() {}
 
+int ActorMage::print() const {
+  return '$';
+}
+
+Point ActorMage::pos() const {
+  return d->pos;
+}
+
+bool ActorMage::move(const Point& tgt) {
+  SPtr<Level> l = d->core.getLevel();
+
+  if (d->alive && l->canCross(tgt)) {
+    d->pos = tgt;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool ActorMage::alive() const {
+  return d->alive;
+}
+
+bool ActorMage::kill() {
+  if (d->mortal) {
+    d->alive = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+ 
 void ActorMage::update() {
-  // Get input and react.
-  InputMethod::Command cmd;
-  if (input)
-    cmd = input->getNextCommand();
-  else
-    cmd = InputMethod::NoCommand;
+  d->checkBombs();
 
-  switch (cmd) {
-  case InputMethod::MoveUp:
-  case InputMethod::MoveRight:
-  case InputMethod::MoveDown:
-  case InputMethod::MoveLeft:
-    d->move(cmd);
-    break;
-  case InputMethod::BombPlant:
-    break;
-  case InputMethod::NoCommand:
-  default:
-    break;
-  };
+  if (input) {
+    InputMethod::Command cmd = input->getNextCommand();
+
+    switch (cmd) {
+    case InputMethod::MoveUp:
+    case InputMethod::MoveDown:
+    case InputMethod::MoveRight:
+    case InputMethod::MoveLeft:
+      d->onCmdMove(cmd);
+      break;
+    case InputMethod::BombPlant:
+      d->onCmdPlant();
+      break;
+    default:
+      break;
+    }
+  }
 }
 
-void ActorMage::explode() {
-
+void ActorMage::Private::checkBombs() {
+  for (auto it = bombs.begin(); it != bombs.end(); ++it) {
+    if (!((*it)->alive())) {
+      it = bombs.erase(it);
+      if (it == bombs.end())
+        break;
+    }
+  }
 }
 
-bool ActorMage::isActive() const {
-  return d->active;
-}
-
-void ActorMage::Private::move(InputMethod::Command cmd) {
-  // Slow character down.
-  tick++;
-  size_t move = (size_t)(speed * tick);
-  if (move == 0)
+void ActorMage::Private::onCmdMove(InputMethod::Command cmd) {
+  int delta = (speed * (tick++));
+  if (delta == 0)
     return;
   else
     tick = 0;
 
-  SPtr<Level> level = core.getLevel();
-  Point pos = level->getObjectPos(self.getId());
+  Point p = pos;
 
   switch (cmd) {
   case InputMethod::MoveUp:
-    if (pos.y == 0)
-      return;
-    else if (pos.y < move)
-      pos.y = 0;
-    else
-      pos.y -= move;
-    break;
-  case InputMethod::MoveLeft:
-    if (pos.x == 0)
-      return;
-    else if (pos.x < move)
-      pos.x = 0;
-    else
-      pos.x -= move;
+    --p.y;
     break;
   case InputMethod::MoveDown:
-    if (pos.y == level->getSize().y)
-      return;
-    else if (pos.y + move > level->getSize().y)
-      pos.y = level->getSize().y;
-    else
-      pos.y += move;
+    ++p.y;
+    break;
+  case InputMethod::MoveLeft:
+    --p.x;
     break;
   case InputMethod::MoveRight:
-    if (pos.x == level->getSize().x)
-      return;
-    else if (pos.x + move > level->getSize().x)
-      pos.x = level->getSize().x;
-    else
-      pos.x += move;
+    ++p.x;
     break;
-  default: // Incorrect move.
+  default:
     return;
+    break;
   };
 
-  level->moveTo(self.getId(), pos);
+  self.move(p);
+}
+
+void ActorMage::Private::onCmdPlant() {
+  if (bombs.size() == bombCount)
+    return;
+
+  SPtr<Bomb> b(new Bomb(core, GameObject::genBombId()));
+  b->setRadius(bombRadius);
+  b->move(pos);
+
+  core.getObjects()->addObject(b);
+  bombs.push_back(b);
 }

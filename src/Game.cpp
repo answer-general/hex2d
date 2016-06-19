@@ -45,22 +45,22 @@ Game::Game() : d(new Private()) {
 Game::~Game() {}
 
 void Game::run() {
-  std::chrono::system_clock::time_point curr;
-  std::chrono::system_clock::time_point prev = std::chrono::system_clock::now();
-  std::chrono::milliseconds lag(0);
+//  std::chrono::system_clock::time_point curr;
+//  std::chrono::system_clock::time_point prev = std::chrono::system_clock::now();
+//  std::chrono::milliseconds lag(0);
 
   while (isRunning()) {
     d->handleInput();
 
     if (d->engine->isRunning()) {
-      curr = std::chrono::system_clock::now();
-      lag += std::chrono::duration_cast<std::chrono::milliseconds>(curr - prev);
+//      curr = std::chrono::system_clock::now();
+//      lag += std::chrono::duration_cast<std::chrono::milliseconds>(curr - prev);
 
       // Advance simulation to current time.
-      while (lag > d->updateMsec) {
+//      while (lag > d->updateMsec) {
         d->engine->update();
-        lag -= d->updateMsec;
-      }
+//        lag -= d->updateMsec;
+//      }
     }
 
     // Render current screen.
@@ -131,6 +131,8 @@ void Game::Private::handleInput() {
     // Delete unneeded inputs.
     if ((*it)->getTarget() == GameObject::InvalidObject) {
       it = inputs.erase(it);
+      if (it == inputs.end()) // Check for last element.
+        break;
     } else {
       (*it)->update();
     }

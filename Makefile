@@ -1,11 +1,12 @@
 CXX=g++
 CXXFLAGS+=-Wall -pedantic -Wno-long-long -O0 -std=c++11 -g
-LDFLAGS=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -g
+LDFLAGS+=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -g
 
 TARGET=./titovden
 SRCDIR=./src
 
 EXEC=hexed
+
 SOURCES=$(addprefix src/, \
   ObjectContainer.cpp \
   Level.cpp \
@@ -17,12 +18,15 @@ SOURCES=$(addprefix src/, \
   screens/GameScreen.cpp \
   UI.cpp \
   KeyboardInput.cpp \
+  GameObject.cpp \
   ActorMage.cpp \
+  Bomb.cpp \
   Engine.cpp \
   Game.cpp \
+  BSDSocket.cpp \
   main.cpp \
-	BSDSocket.cpp \
 )
+
 OBJECTS=$(SOURCES:.cpp=.o)
 
 all: compile
