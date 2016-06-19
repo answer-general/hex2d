@@ -24,6 +24,8 @@ int MapView::Private::getSymbol(int id) {
     res = '#';
   else if (id == GameObject::TileFloor)
     res = ' ';
+  else if (GameObject::idIsActor(id))
+    res = '0' + id - GameObject::ActorMinId;
   else
     res = '?';
 

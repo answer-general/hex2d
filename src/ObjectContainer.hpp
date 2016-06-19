@@ -16,7 +16,11 @@ public:
   ~ObjectContainer();
 
   bool addObject(SPtr<GameObject>);
+  bool removeObject(int id);
   SPtr<GameObject> getObject(int id);
+
+  // Helper for global updating.
+  void updateAll();
 private:
   class Private;
   UPtr<Private> d;

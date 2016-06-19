@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <panel.h>
+#include "../Engine.hpp"
 #include "../Game.hpp"
 #include "../Level.hpp"
 #include "../UI.hpp"
@@ -52,6 +53,7 @@ void GameScreen::handleInput(int kbdIn) {
     // Stop game and go to main menu.
     // Replace with engine's reset.
     d->core.getLevel()->reset();
+    d->core.getEngine()->stop();
     d->core.getUI()->switchScreen(UI::MainMenuScreen);
     break;
   default:
@@ -62,9 +64,9 @@ void GameScreen::handleInput(int kbdIn) {
 void GameScreen::draw() {
   if (!d->shown) {
     top_panel(d->panel);
-    d->gameArea->update();
     d->shown = true;
   }
+  d->gameArea->update();
 }
 
 void GameScreen::erase() {

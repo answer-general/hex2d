@@ -14,6 +14,10 @@ public:
   ~ActorMage();
 
   void update();
+
+  void explode();
+
+  bool isActive() const;
 private:
   class Private;
   UPtr<Private> d;

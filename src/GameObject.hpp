@@ -27,6 +27,7 @@ public:
     BonusMaxId = 511
   };
 
+  static bool idIsTile(int id) { return (id > TileMinId) && (id < TileMaxId); };
   static bool idIsActor(int id) { return (id > ActorMinId) && (id < ActorMaxId); };
   static bool idIsBomb(int id) { return (id > BombMinId) && (id < BombMaxId); };
   static bool idIsBonus(int id) { return (id > BonusMinId) && (id < BonusMaxId); };
@@ -44,6 +45,10 @@ public:
   virtual bool passable() const = 0;
 
   virtual void update() {};
+
+  /// Mark for destructible (and, especially, self-destructible) objects
+  /// Defaults to immortal object.
+  virtual bool isActive() const { return true; };
 protected:
   int id;
 };

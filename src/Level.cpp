@@ -4,6 +4,7 @@
 #include "Tiles.hpp"
 #include "ObjectContainer.hpp"
 #include <algorithm>
+#include <map>
 #include <stdexcept>
 #include <stdio.h>
 #include <utility>
@@ -26,6 +27,8 @@ Cell& Cell::operator =(const Cell& o) {
 }
 
 size_t Cell::size() const { return used; }
+
+void Cell::clear() { used = 0; }
 
 bool Cell::back(int& res) const {
   if (used == 0)
@@ -77,7 +80,7 @@ bool Cell::erase(size_t idx) {
 class Level::Private {
 public:
   Private(Game& c) : core(c), size(0, 0), field(),
-      spawns(), spawnsUsed(0), cells() {};
+      spawns(), spawnsUsed(0), idPos(), posIds() {};
 
   bool levelSizeFromFile(FILE* in);
   bool fieldFromFile(FILE* in);
@@ -93,8 +96,12 @@ public:
   std::vector<Point> spawns;
   size_t spawnsUsed;
 
-  // Efficient due to relatively small objects count.
-  std::vector< std::pair< Cell, Point > > cells;
+  // Dynamic objects lookup structures.
+  std::map<int, Point> idPos;
+  std::map<Point, Cell> posIds;
+
+//  // Efficient due to relatively small objects count.
+//  std::vector< std::pair< Cell, Point > > cells;
 };
 
 Level::Level(Game& core) : d(new Private(core)) {
@@ -109,7 +116,7 @@ const Point& Level::getSize() const {
 }
 
 int Level::getTopObjectAt(const Point& pos) const {
-  if (pos.x > d->size.x || pos.y > d->size.y) {
+  if (pos.x >= d->size.x || pos.y >= d->size.y) {
     return GameObject::InvalidObject;
   }
 
@@ -119,21 +126,25 @@ int Level::getTopObjectAt(const Point& pos) const {
 Cell Level::getCellAt(const Point& pos) const {
   Cell res;
   
-  if (pos.x > d->size.x || pos.y > d->size.y) {
+  if (pos.x >= d->size.x || pos.y >= d->size.y) {
     res.push(GameObject::InvalidObject);
   } else {
-    // Find if there are several objects in cell.
-    auto it = std::find_if(d->cells.begin(), d->cells.end(),
-        [pos](const std::pair<Cell, Point>& v)
-        { return v.second == pos; });
-
-    if (it != d->cells.end()) // Multiple objects found, copy cell.
-      res = it->first;
-    else // Only one object, take from field.
-      res.push(d->fieldAt(pos));
+    auto it = d->posIds.find(pos);
+    if (it == d->posIds.end())
+      res.push(GameObject::InvalidObject);
+    else
+      res = it->second;
   }
 
   return res;
+}
+
+Point Level::getObjectPos(int id) const {
+  auto it = d->idPos.find(id);
+  if (it == d->idPos.end())
+    throw std::out_of_range("Id not found" + std::to_string(id));
+
+  return it->second;
 }
 
 bool Level::spawn(int objId) {
@@ -150,84 +161,78 @@ bool Level::spawn(int objId) {
 }
 
 bool Level::moveTo(int id, const Point& pos) {
-  if (pos.x > d->size.x || pos.y > d->size.y)
+  if (pos.x >= d->size.x || pos.y >= d->size.y)
     return false;
-  
-  try {
-    d->core.getObjects()->getObject(id);
-  } catch (const std::out_of_range&) {
+
+  // Find old location.
+  auto it = d->idPos.find(id);
+  if (it == d->idPos.end()) // Object not on field.
     return false;
-  };
 
-  // Remove id from previous cell.
-  { auto it = std::find_if(d->cells.begin(), d->cells.end(),
-      [id](const std::pair<Cell, Point>& v)
-      { return v.first.find(id) != -1; });
+  Point oldLoc = it->second;
 
-    // Id found.
-    if (it != d->cells.end()) {
-      // Take this element away.
-      int idx = it->first.find(id);
-      it->first.erase(idx);
-
-      // Restore top element.
-      it->first.back(d->fieldAt(it->second));
-
-      // Only one object left, no ambiguity.
-      if (it->first.size() == 1)
-        d->cells.erase(it);
-    }
+  // Get cell at new location.
+  auto kt = d->posIds.find(pos);
+  Cell c;
+  if (kt == d->posIds.end()) { // Not found, create.
+    c.push(d->fieldAt(pos));
+  } else {
+    c = kt->second;
   }
 
-  // Add id to the new cell.
-  { // Save current cell value.
-    auto it = std::find_if(d->cells.begin(), d->cells.end(),
-      [pos](const std::pair<Cell, Point>& v) { return v.second == pos; });
+  // Check, if we can step on the new cell.
+  int tmp;
+  c.back(tmp);
+  if (!d->core.getObjects()->getObject(tmp)->passable())
+    return false;
 
-    if (it == d->cells.end()) { // Cell not occupied, save info.
-      Cell c;
-      c.push(d->fieldAt(pos));
-      c.push(id);
+  // Remove id from the old cell and place to new.
+  kt = d->posIds.find(oldLoc);
+  if (kt != d->posIds.end()) {
+    // Remove id from cell.
+    int idx = kt->second.find(id);
+    kt->second.erase(idx);
 
-      d->cells.push_back(std::pair<Cell, Point>(c, pos));
-    } else { // Add id to the top.
-      if (!it->first.push(id))
-        return false;
-    }  
+    // Find new top.
+    int tmp;
+    kt->second.back(tmp);
+    d->fieldAt(oldLoc) = tmp;
+
+    // Only one element left -> cell unneeded.
+    if (kt->second.size() == 1)
+      d->posIds.erase(kt);
   }
 
-  // Place id on the field as well;
+  d->idPos[id] = pos;
+
+  c.push(id);
+  d->posIds[pos] = c;
   d->fieldAt(pos) = id;
-  return true; 
+
+  return true;
 }
 
+// Warning! Doesn't check for walls!
 bool Level::placeAt(int id, const Point& pos) {
-  if (pos.x > d->size.x || pos.y > d->size.y)
+  if (pos.x >= d->size.x || pos.y >= d->size.y)
     return false;
 
-  try {
-    d->core.getObjects()->getObject(id);
-  } catch (const std::out_of_range&) {
-    return false;
-  };
-
-  // Save current cell value.
-  auto it = std::find_if(d->cells.begin(), d->cells.end(),
-      [pos](const std::pair<Cell, Point>& v) { return v.second == pos; });
-
-  if (it == d->cells.end()) { // Cell not occupied, save info.
-    Cell c;
+  // Get cell.
+  Cell c = d->posIds[pos];
+  // Push current top cell if empty.
+  if (c.size() == 0)
     c.push(d->fieldAt(pos));
-    c.push(id);
 
-    d->cells.push_back(std::pair<Cell, Point>(c, pos));
-  } else { // Add id to the top.
-    if (!it->first.push(id))
-      return false;
-  }
+  // Place new top.
+  d->idPos[id] = pos;
 
-  // Place id on the field as well;
-  d->fieldAt(pos) = id;
+  c.push(id);
+  d->posIds[pos] = c;
+  
+  int tmp;
+  c.back(tmp);
+  d->fieldAt(pos) = tmp;
+
   return true;
 }
 
@@ -263,8 +268,8 @@ void Level::reset() {
   d->spawns.shrink_to_fit();
   d->spawnsUsed = 0;
 
-  d->cells.clear();
-  d->cells.shrink_to_fit();
+//  d->cells.clear();
+//  d->cells.shrink_to_fit();
 }
 
 bool Level::Private::levelSizeFromFile(FILE* in) {
@@ -287,7 +292,6 @@ bool Level::Private::levelSizeFromFile(FILE* in) {
 }
 
 bool Level::Private::fieldFromFile(FILE* in) {
-  field.reserve(size.x * size.y);
   field.resize(size.x * size.y, 0);
 
   // Get tiles.

@@ -1,4 +1,6 @@
+#include <chrono>
 #include <ncurses.h>
+#include "Engine.hpp"
 #include "Game.hpp"
 #include "ObjectContainer.hpp"
 #include "Level.hpp"
@@ -10,26 +12,41 @@ public:
   // Components.
   SPtr<ObjectContainer> gameObjects;
   SPtr<Config> config;
+  SPtr<Engine> engine;
   SPtr<UI> ui;
   SPtr<Level> loadedLevel;
 
-  bool isRunning;
+  bool isRunning;  
+
+  // Controls loop speed.
+  static const std::chrono::milliseconds updateMsec;
 };
+
+const std::chrono::milliseconds Game::Private::updateMsec = std::chrono::milliseconds(100);
 
 Game::Game() : d(new Private()) {
   d->gameObjects.reset(new ObjectContainer());
   d->config.reset(new Config());
+  d->engine.reset(new Engine(*this));
   d->ui.reset(new UI(*this));
 
   d->loadedLevel.reset(new Level(*this));
   d->isRunning = true;
+
 }
 
 Game::~Game() {}
 
 void Game::update() {
+
+  if (d->engine->isRunning()) {
+    // Advance simulation to current time.
+    
+    d->engine->update();
+  }
+
+  // Render current screen.
   d->ui->update();
-  
   // Discard symbol at keyboard input.
   getch();
 }
@@ -48,6 +65,14 @@ SPtr<Config> Game::getConfig() {
 
 const SPtr<Config> Game::getConfig() const {
   return d->config;
+}
+
+SPtr<Engine> Game::getEngine() {
+  return d->engine;
+}
+
+const SPtr<Engine> Game::getEngine() const {
+  return d->engine;
 }
 
 SPtr<Level> Game::getLevel() {

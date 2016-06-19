@@ -17,13 +17,15 @@ public:
   virtual ~Actor() {};
 
   virtual void setInputMethod(SPtr<InputMethod> in) { input = in; };
-
-  virtual void update() = 0;
   
   virtual bool explodable() const { return true; };
   virtual bool passable() const { return false; };
 
+  // Behaviour modification.
+  virtual void explode() = 0;
+
   // Property modificators for bonuses.
+  
 protected:
   SPtr<InputMethod> input;
 };

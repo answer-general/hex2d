@@ -4,6 +4,7 @@
 #include "commons.hpp"
 
 class Config;
+class Engine;
 class Level;
 class ObjectContainer;
 class UI;
@@ -26,6 +27,9 @@ public:
   // Component access
   SPtr<Config> getConfig();
   const SPtr<Config> getConfig() const;
+
+  SPtr<Engine> getEngine();
+  const SPtr<Engine> getEngine() const;
 
   SPtr<Level> getLevel();
   const SPtr<Level> getLevel() const;

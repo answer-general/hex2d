@@ -3,6 +3,7 @@
 #include <panel.h>
 #include <string>
 #include <vector>
+#include "../Engine.hpp"
 #include "../Game.hpp"
 #include "../Config.hpp"
 #include "../FileHelper.hpp"
@@ -81,6 +82,11 @@ void LevelSelect::Private::selectItem(int idx) {
   if (entries[idx] != nullptr) { // Existing element selected.
     // Setup new game session. Need to move this to engine.
     core.getLevel()->fromFile(levelNames[idx]);
+
+    SPtr<Engine> engine = core.getEngine();
+    engine->stop();
+    engine->setMode(Engine::ModeSingle);
+    engine->run();
 
     core.getUI()->switchScreen(UI::GameSingle);
   }

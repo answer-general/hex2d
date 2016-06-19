@@ -14,6 +14,7 @@ public:
   Cell& operator =(const Cell& o);
 
   size_t size() const;
+  void clear();
 
   /// /return false if empty.
   bool back(int& id) const;
@@ -46,6 +47,8 @@ public:
 
   int getTopObjectAt(const Point& pos) const;
   Cell getCellAt(const Point& pos) const;
+
+  Point getObjectPos(int id) const;
 
   bool spawn(int objId);
   bool moveTo(int id, const Point& pos);

@@ -27,7 +27,21 @@ bool ObjectContainer::addObject(SPtr<GameObject> obj) {
   return state.second;
 }
 
+bool ObjectContainer::removeObject(int id) {
+  auto it = d->objects.find(id);
+  
+  if (it == d->objects.end())
+    return false;
+
+  d->objects.erase(it);
+  return true;
+}
+
 SPtr<GameObject> ObjectContainer::getObject(int id) {
   return d->objects.at(id);
 }
 
+void ObjectContainer::updateAll() {
+  for (auto it = d->objects.begin(); it != d->objects.end(); ++it)
+    it->second->update();
+}
