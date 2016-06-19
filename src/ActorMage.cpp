@@ -5,21 +5,26 @@
 
 class ActorMage::Private {
 public:
-  Private(Game& c) : core(c), active(true) {};
+  const double defaultSpeed = 0.25;
+
+  Private(Game& c, ActorMage& self) : core(c), self(self), 
+      active(true), speed(defaultSpeed), tick(0) {};
+  void move(InputMethod::Command cmd);
 
   Game& core;
+  ActorMage& self;
 
   bool active;
+  double speed;
+  size_t tick;
 };
 
-ActorMage::ActorMage(Game& core, int id) : Actor(id), d(new Private(core)) {}
+ActorMage::ActorMage(Game& core, int id) : Actor(id),
+    d(new Private(core, *this)) {}
 
 ActorMage::~ActorMage() {}
 
 void ActorMage::update() {
-  SPtr<Level> level = d->core.getLevel();
-  Point currentPos = level->getObjectPos(id);
-
   // Get input and react.
   InputMethod::Command cmd;
   if (input)
@@ -29,22 +34,10 @@ void ActorMage::update() {
 
   switch (cmd) {
   case InputMethod::MoveUp:
-    if (currentPos.y > 0)
-      --currentPos.y;
-    level->moveTo(id, currentPos);
-    break;
   case InputMethod::MoveRight:
-    ++currentPos.x;
-    level->moveTo(id, currentPos);
-    break;
   case InputMethod::MoveDown:
-    ++currentPos.y;
-    level->moveTo(id, currentPos);
-    break;
   case InputMethod::MoveLeft:
-    if (currentPos.x > 0)
-      --currentPos.x;
-    level->moveTo(id, currentPos);
+    d->move(cmd);
     break;
   case InputMethod::BombPlant:
     break;
@@ -60,4 +53,56 @@ void ActorMage::explode() {
 
 bool ActorMage::isActive() const {
   return d->active;
+}
+
+void ActorMage::Private::move(InputMethod::Command cmd) {
+  // Slow character down.
+  tick++;
+  size_t move = (size_t)(speed * tick);
+  if (move == 0)
+    return;
+  else
+    tick = 0;
+
+  SPtr<Level> level = core.getLevel();
+  Point pos = level->getObjectPos(self.getId());
+
+  switch (cmd) {
+  case InputMethod::MoveUp:
+    if (pos.y == 0)
+      return;
+    else if (pos.y < move)
+      pos.y = 0;
+    else
+      pos.y -= move;
+    break;
+  case InputMethod::MoveLeft:
+    if (pos.x == 0)
+      return;
+    else if (pos.x < move)
+      pos.x = 0;
+    else
+      pos.x -= move;
+    break;
+  case InputMethod::MoveDown:
+    if (pos.y == level->getSize().y)
+      return;
+    else if (pos.y + move > level->getSize().y)
+      pos.y = level->getSize().y;
+    else
+      pos.y += move;
+    break;
+  case InputMethod::MoveRight:
+    if (pos.x == level->getSize().x)
+      return;
+    else if (pos.x + move > level->getSize().x)
+      pos.x = level->getSize().x;
+    else
+      pos.x += move;
+    break;
+  default: // Incorrect move.
+    return;
+  };
+
+  level->moveTo(self.getId(), pos);
 }

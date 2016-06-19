@@ -12,8 +12,7 @@ int main(void) {
 
   Game game;
 
-  while (game.isRunning())
-    game.update();
+  game.run();
 
   endwin();
   return 0; // Not reached.

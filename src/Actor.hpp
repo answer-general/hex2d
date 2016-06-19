@@ -3,9 +3,9 @@
 
 #include "commons.hpp"
 #include "GameObject.hpp"
+#include "InputMethod.hpp"
 
 class Game;
-class InputMethod;
 
 class Actor : public GameObject {
 public:
@@ -14,7 +14,11 @@ public:
   Actor(const Actor&) = delete;
   Actor& operator =(const Actor&) = delete;
 
-  virtual ~Actor() {};
+  virtual ~Actor() {
+    // Free input.
+    if (input)
+      input->assign(GameObject::InvalidObject);
+  };
 
   virtual void setInputMethod(SPtr<InputMethod> in) { input = in; };
   

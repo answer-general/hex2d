@@ -1,6 +1,8 @@
 #ifndef INPUT_METHOD_HPP
 #define INPUT_METHOD_HPP
 
+#include "GameObject.hpp"
+
 class InputMethod {
 public:
   enum Command {
@@ -12,10 +14,13 @@ public:
     NoCommand
   };
 
-  InputMethod(int id) : target(id) {};
+  InputMethod() : target(GameObject::InvalidObject) {};
 
   InputMethod(const InputMethod&) = delete;
   InputMethod& operator =(const InputMethod&) = delete;
+
+  void assign(int id) { target = id; };
+  int getTarget() const { return target; };
 
   virtual ~InputMethod() {};
 

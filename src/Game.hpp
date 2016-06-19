@@ -5,6 +5,7 @@
 
 class Config;
 class Engine;
+class InputMethod;
 class Level;
 class ObjectContainer;
 class UI;
@@ -18,8 +19,7 @@ public:
 
   ~Game();
 
-  /// Advance by one tick.
-  void update();
+  void run();
 
   bool isRunning() const;
   void quit();
@@ -39,6 +39,8 @@ public:
 
   SPtr<UI> getUI();
   const SPtr<UI> getUI() const;
+
+  SPtr<InputMethod> newKbdInput();
 private:
   class Private;
   UPtr<Private> d;

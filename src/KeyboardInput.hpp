@@ -8,7 +8,7 @@ class Game;
 
 class KeyboardInput : public InputMethod {
 public:
-  KeyboardInput(int tgtId, Game& core);
+  KeyboardInput(Game& core);
 
   KeyboardInput(const KeyboardInput&) = delete;
   KeyboardInput& operator =(const KeyboardInput&) = delete;

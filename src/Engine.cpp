@@ -1,11 +1,8 @@
-#include <vector>
 #include "ActorMage.hpp"
 #include "Engine.hpp"
 #include "Game.hpp"
 #include "ObjectContainer.hpp"
 #include "GameObject.hpp"
-#include "InputMethod.hpp"
-#include "KeyboardInput.hpp"
 #include "Level.hpp"
 
 class Engine::Private {
@@ -19,8 +16,6 @@ public:
   Game& core;
   bool running;
   enum Engine::Mode mode;
-
-  std::vector< SPtr<InputMethod> > inputs;
 };
 
 void Engine::Private::setupSingle() {
@@ -30,10 +25,10 @@ void Engine::Private::setupSingle() {
   // Create Player character.
   SPtr<ActorMage> player1(new ActorMage(core, GameObject::ActorPlayer1));
 
-  // Assign input method.
-  SPtr<InputMethod> keyInput(new KeyboardInput(player1->getId(), core));
-  inputs.push_back(keyInput);
-  player1->setInputMethod(keyInput);
+  // Assign input.
+  SPtr<InputMethod> kbdIn = core.newKbdInput();
+  kbdIn->assign(player1->getId());
+  player1->setInputMethod(kbdIn);
 
   // Add to objects container and spawn.
   objects->addObject(player1);
@@ -78,10 +73,6 @@ void Engine::restart() {
 }
 
 void Engine::update() {
-  // Handle input.
-  for (auto x : d->inputs)
-    x->update();
-
   d->core.getObjects()->updateAll();
 }
 

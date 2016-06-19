@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include "Config.hpp"
 #include "Game.hpp"
+#include "GameObject.hpp"
 #include "KeyboardInput.hpp"
 
 class KeyboardInput::Private {
@@ -12,7 +13,7 @@ public:
   enum InputMethod::Command lastCmd;
 };
 
-KeyboardInput::KeyboardInput(int tgtId, Game& core) : InputMethod(tgtId),
+KeyboardInput::KeyboardInput(Game& core) : InputMethod(),
     d(new Private(core)) {}
 
 KeyboardInput::~KeyboardInput() {}
@@ -24,11 +25,13 @@ enum InputMethod::Command KeyboardInput::getNextCommand() {
 }
 
 void KeyboardInput::update() {
-  SPtr<Config> conf = d->core.getConfig();
+  if (target != GameObject::InvalidObject) {
+    SPtr<Config> conf = d->core.getConfig();
 
-  // Peek at character.
-  int in = getch();
-  ungetch(in);
+    // Peek at character.
+    int in = getch();
+    ungetch(in);
 
-  d->lastCmd = conf->getKbdCommand(target, in);
+    d->lastCmd = conf->getKbdCommand(target, in);
+  }
 }

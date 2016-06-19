@@ -1,7 +1,10 @@
 #include <chrono>
 #include <ncurses.h>
+#include <vector>
 #include "Engine.hpp"
 #include "Game.hpp"
+#include "InputMethod.hpp"
+#include "KeyboardInput.hpp"
 #include "ObjectContainer.hpp"
 #include "Level.hpp"
 #include "Config.hpp"
@@ -9,12 +12,16 @@
 
 class Game::Private {
 public:
+  void handleInput();
+
   // Components.
   SPtr<ObjectContainer> gameObjects;
   SPtr<Config> config;
   SPtr<Engine> engine;
   SPtr<UI> ui;
   SPtr<Level> loadedLevel;
+
+  std::vector< SPtr<InputMethod> > inputs;
 
   bool isRunning;  
 
@@ -37,18 +44,30 @@ Game::Game() : d(new Private()) {
 
 Game::~Game() {}
 
-void Game::update() {
+void Game::run() {
+  std::chrono::system_clock::time_point curr;
+  std::chrono::system_clock::time_point prev = std::chrono::system_clock::now();
+  std::chrono::milliseconds lag(0);
 
-  if (d->engine->isRunning()) {
-    // Advance simulation to current time.
-    
-    d->engine->update();
+  while (isRunning()) {
+    d->handleInput();
+
+    if (d->engine->isRunning()) {
+      curr = std::chrono::system_clock::now();
+      lag += std::chrono::duration_cast<std::chrono::milliseconds>(curr - prev);
+
+      // Advance simulation to current time.
+      while (lag > d->updateMsec) {
+        d->engine->update();
+        lag -= d->updateMsec;
+      }
+    }
+
+    // Render current screen.
+    d->ui->update();
+    // Discard symbol at keyboard input.
+    getch();
   }
-
-  // Render current screen.
-  d->ui->update();
-  // Discard symbol at keyboard input.
-  getch();
 }
 
 bool Game::isRunning() const {
@@ -97,4 +116,23 @@ SPtr<UI> Game::getUI() {
 
 const SPtr<UI> Game::getUI() const {
   return d->ui;
+}
+
+SPtr<InputMethod> Game::newKbdInput() {
+  SPtr<InputMethod> res(new KeyboardInput(*this));
+
+  d->inputs.push_back(res);
+
+  return res;
+}
+
+void Game::Private::handleInput() {
+  for (auto it = inputs.begin(); it != inputs.end(); ++it) {
+    // Delete unneeded inputs.
+    if ((*it)->getTarget() == GameObject::InvalidObject) {
+      it = inputs.erase(it);
+    } else {
+      (*it)->update();
+    }
+  }
 }
