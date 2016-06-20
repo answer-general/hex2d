@@ -83,8 +83,10 @@ void Engine::update() {
   for (auto x : ids) {
     auto t = objs->getObject(x);
     if (!t->alive()) {
-      if (t->getId() == d->core.getPCId()) // Oops... Player died.
-        d->core.setPC(GameObject::InvalidObject);
+      if (t->getId() == d->core.getPlayer1Id()) // Oops... Player died.
+        d->core.setPlayer1(GameObject::InvalidObject);
+      else if (t->getId() == d->core.getPlayer2Id()) // Player 2 died as well.
+        d->core.setPlayer2(GameObject::InvalidObject);
       objs->removeObject(x);
     }
   }
@@ -191,8 +193,9 @@ void Engine::Private::setupSingle() {
   player1->move(pos);
 
   objects->addObject(player1);
-  core.setPC(player1->getId());
+  core.setPlayer1(player1->getId());
 
+  // Fill the rest with npcs.
   Point badPos(-1,-1);
   for (Point p = level->nextSpawn(); p != badPos; p = level->nextSpawn()) {
     SPtr<ActorImp> npc(new ActorImp(core, GameObject::genActorId()));
@@ -207,7 +210,44 @@ void Engine::Private::setupSingle() {
 }
 
 void Engine::Private::setupHotseat() {
+  SPtr<ObjectContainer> objects = core.getObjects();
+  SPtr<Level> level = core.getLevel();
 
+  // Create Player characters.
+  SPtr<ActorMage> player1(new ActorMage(core, GameObject::genActorId()));
+  SPtr<ActorMage> player2(new ActorMage(core, GameObject::genActorId()));
+
+  // Assign input.
+  SPtr<InputMethod> kbdIn = core.newKbdInput();
+  kbdIn->assign(player1->getId());
+  player1->setInputMethod(kbdIn);
+  SPtr<InputMethod> kbdIn2 = core.newKbdInput();
+  kbdIn2->assign(player2->getId());
+  player2->setInputMethod(kbdIn2);
+
+  // Add to objects container and spawn.
+  Point pos = level->nextSpawn();
+  player1->move(pos);
+  pos = level->nextSpawn();
+  player2->move(pos);
+
+  objects->addObject(player1);
+  core.setPlayer1(player1->getId());
+  objects->addObject(player2);
+  core.setPlayer2(player2->getId());
+
+  // Fill the rest with npcs.
+  Point badPos(-1,-1);
+  for (Point p = level->nextSpawn(); p != badPos; p = level->nextSpawn()) {
+    SPtr<ActorImp> npc(new ActorImp(core, GameObject::genActorId()));
+    npc->move(p);
+
+    SPtr<InputMethod> aiIn = core.newAIInput();
+    aiIn->assign(npc->getId());
+    npc->setInputMethod(aiIn);
+
+    objects->addObject(npc);
+  }
 }
 
 void Engine::Private::setupMulti() {

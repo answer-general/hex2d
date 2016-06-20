@@ -134,16 +134,28 @@ public:
   // Player character
   /*!
    * \fn int getPCId() const
-   * Returns player's identification number.
+   * \returns player 1 identification number.
    * \public \memberof Game
    */
-  int getPCId() const;
+  int getPlayer1Id() const;
   /*!
-   * \fn void setPC(int)
-   * Sets player's identification number.
+   * \fn void setPlayer1(int)
+   * Sets player 1 identification number.
    * \public \memberof Game
    */
-  void setPC(int);
+  void setPlayer1(int);
+  /*!
+   * \fn int getPlayer2Id() const
+   * \returns player 2 identification number.
+   * \public \memberof Game
+   */
+  int getPlayer2Id() const;
+  /*!
+   * \fn void setPlayer2(int)
+   * Sets player 2 identification number.
+   * \public \memberof Game
+   */
+  void setPlayer2(int);  
 private:
   class Private;
   UPtr<Private> d;

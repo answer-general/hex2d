@@ -11,7 +11,7 @@ int dist2(const Point& a, const Point& b);
 
 class AIInput::Private {
 public:
-  static const int defaultRadius = 2;
+  static const int defaultRadius = 4;
 
   struct Plan {
     InputMethod::Command best;

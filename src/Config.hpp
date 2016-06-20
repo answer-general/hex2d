@@ -16,8 +16,9 @@ public:
   /*!
    * Base constructor for config.
    * \public \memberof Config
+   * @param[in]  core Reference to the game core.
    */
-  Config();
+  Config(Game& core);
   /*!
    * Prohibit copying objects
    */

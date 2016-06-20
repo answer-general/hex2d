@@ -30,21 +30,23 @@ public:
   // Controls loop speed.
   static const std::chrono::milliseconds updateMsec;
 
-  int pcId;
+  int pc1Id;
+  int pc2Id;
 };
 
 const std::chrono::milliseconds Game::Private::updateMsec = std::chrono::milliseconds(50);
 
 Game::Game() : d(new Private()) {
   d->gameObjects.reset(new ObjectContainer());
-  d->config.reset(new Config());
+  d->config.reset(new Config(*this));
   d->engine.reset(new Engine(*this));
   d->ui.reset(new UI(*this));
 
   d->loadedLevel.reset(new Level(*this));
   d->isRunning = true;
 
-  d->pcId = GameObject::InvalidObject;
+  d->pc1Id = GameObject::InvalidObject;
+  d->pc2Id = GameObject::InvalidObject;
 }
 
 Game::~Game() {}
@@ -68,7 +70,8 @@ void Game::run() {
         d->engine->update();
         lag -= d->updateMsec;
 
-        if (d->pcId == GameObject::InvalidObject) { // Game over.
+        if (d->pc1Id == GameObject::InvalidObject &&
+            d->pc2Id == GameObject::InvalidObject) { // Game over.
           d->engine->stop();
         }
       }
@@ -147,12 +150,20 @@ SPtr<InputMethod> Game::newAIInput() {
   return res;
 }
 
-int Game::getPCId() const {
-  return d->pcId;
+int Game::getPlayer1Id() const {
+  return d->pc1Id;
 }
 
-void Game::setPC(int id) {
-  d->pcId = id;
+void Game::setPlayer1(int id) {
+  d->pc1Id = id;
+}
+
+int Game::getPlayer2Id() const {
+  return d->pc2Id;
+}
+
+void Game::setPlayer2(int id) {
+  d->pc2Id = id;
 }
 
 void Game::Private::handleInput() {

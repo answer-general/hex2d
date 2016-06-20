@@ -9,7 +9,7 @@
 
 class ActorImp::Private {
 public:
-  static const int defaultSpeed = 1;
+  static const double defaultSpeed;
 
   Private(ActorImp& s) : self(s), alive(true),
       speed(defaultSpeed), tick(0) {};
@@ -22,6 +22,8 @@ public:
   int speed;
   int tick;
 };
+
+const double ActorImp::Private::defaultSpeed = 0.5;
 
 ActorImp::ActorImp(Game& core, int id) : Actor(core, id), d(new Private(*this)) {}
 
@@ -74,7 +76,7 @@ void ActorImp::onStackWith(int id) {
 }
 
 void ActorImp::Private::onCmdMove(InputMethod::Command cmd) {
-  int delta = (speed * (tick++));
+  int delta = (speed * (++tick));
   if (delta == 0)
     return;
   else
