@@ -57,11 +57,6 @@ public:
    * \public \memberof Bomb
    */
   void update();
-  /*!
-   * \fn void onStackWith(int)
-   * \brief Doing nothing
-   * \public \memberof Bomb
-   */
   void onStackWith(int);
   /*!
    * \fn size_t getRadius() const
