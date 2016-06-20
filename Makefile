@@ -26,7 +26,6 @@ SOURCES=$(addprefix src/, \
   Bonus.cpp \
   Engine.cpp \
   Game.cpp \
-  BSDSocket.cpp \
   main.cpp \
 )
 
