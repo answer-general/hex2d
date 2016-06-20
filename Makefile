@@ -40,6 +40,10 @@ doc:
 	mkdir -p $(TARGET)
 	doxygen
 
+install:
+	mkdir -p $$HOME/.config/HexedMan
+	cp -r $(SRCDIR)/assets/* $$HOME/.config/HexedMan/
+
 $(TARGET)/$(EXEC): $(OBJECTS)
 	mkdir -p $(TARGET)
 	$(CXX) $(OBJECTS) -o $(TARGET)/$(EXEC) $(LDFLAGS)

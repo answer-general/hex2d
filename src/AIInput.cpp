@@ -11,6 +11,7 @@ int dist2(const Point& a, const Point& b);
 
 class AIInput::Private {
 public:
+  static const int tickRate = 8; // Decrease "jitter".
   static const int defaultRadius = 4;
 
   struct Plan {
@@ -22,7 +23,7 @@ public:
 
   Private(Game& c, AIInput& s) : core(c), self(s),
       lastCommand(InputMethod::NoCommand),
-      radius(defaultRadius) {};
+      radius(defaultRadius), tick(0) {};
   Point currentPosition();
   Point findNearestTarget();
   Plan getPlan(const Point& a, const Point& b);
@@ -33,6 +34,7 @@ public:
 
   InputMethod::Command lastCommand;
   int radius;
+  int tick;
 };
 
 int Abs(int a) {
@@ -57,6 +59,13 @@ enum InputMethod::Command AIInput::getNextCommand() {
 }
 
 void AIInput::update() {
+  // Wait for tick.
+  if (d->tick != d->tickRate) {
+    d->tick++;
+    return;
+  } else {
+    d->tick = 0;
+  }
   Point curr = d->currentPosition();
   Point tgt = d->findNearestTarget();
   // Target not found, go to middle of the map.
@@ -163,7 +172,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
 
   // Look through all 8 configurations.
   if ((a.x < b.x) && (a.y > b.y)) { // 1st quarter.
-    if (diff.x < diff.y) { // Steep eighth.
+    if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveRight;
       res.good = InputMethod::MoveUp;
       res.bad = InputMethod::MoveLeft;
@@ -175,7 +184,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
       res.worst = InputMethod::MoveLeft;
     }
     } else if ((a.x > b.x) && (a.y > b.y)) { // 2nd quarter.
-    if (diff.x < diff.y) { // Steep eighth.
+    if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveLeft;
       res.good = InputMethod::MoveUp;
       res.bad = InputMethod::MoveRight;
@@ -187,7 +196,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
       res.worst = InputMethod::MoveRight;
     }  
   } else if ((a.x > b.x) && (a.y < b.y)) { // 3rd quarter.
-    if (diff.x < diff.y) { // Steep eighth.
+    if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveLeft;
       res.good = InputMethod::MoveDown;
       res.bad = InputMethod::MoveRight;
@@ -199,7 +208,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
       res.worst = InputMethod::MoveRight;
     }  
   } else { // 4th quarter.
-    if (diff.x < diff.y) { // Steep eighth.
+    if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveRight;
       res.good = InputMethod::MoveDown;
       res.bad = InputMethod::MoveLeft;

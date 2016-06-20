@@ -1,0 +1,11 @@
+Player1.Left a
+Player1.Right d
+Player1.Up w
+Player1.Down s
+Player1.Plant v
+
+Player2.Left j
+Player2.Right l
+Player2.Up i
+Player2.Down k
+Player2.Plant /

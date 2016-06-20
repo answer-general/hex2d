@@ -19,7 +19,7 @@ public:
   ActorImp& self;
 
   bool alive;
-  int speed;
+  double speed;
   int tick;
 };
 
@@ -76,7 +76,7 @@ void ActorImp::onStackWith(int id) {
 }
 
 void ActorImp::Private::onCmdMove(InputMethod::Command cmd) {
-  int delta = (speed * (++tick));
+  int delta = speed * (double)(++tick);
   if (delta == 0)
     return;
   else
