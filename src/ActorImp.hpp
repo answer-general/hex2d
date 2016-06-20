@@ -34,7 +34,7 @@ public:
 
   /*!
    * \fn int print() const
-   * \brief Returns NPC's icon(letter)
+   * \brief Returns NPC's icon(letter): '@'
    * \public \memberof ActorImp
    */
   int print() const;
@@ -93,7 +93,7 @@ public:
   /*!
    * \fn void boostSpeed(int newVal, int durationTicks)
    * \brief Accelerate bombs' speed 
-   * \public \memberof Actor
+   * \public \memberof ActorImp
    * @param[in] newVal New speed's value
    * @param[in] durationTicks Boost's duration
    */
