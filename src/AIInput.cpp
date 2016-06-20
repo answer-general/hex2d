@@ -171,7 +171,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
   diff.y = Abs(a.y - b.y);
 
   // Look through all 8 configurations.
-  if ((a.x < b.x) && (a.y > b.y)) { // 1st quarter.
+  if ((a.x <= b.x) && (a.y >= b.y)) { // 1st quarter.
     if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveRight;
       res.good = InputMethod::MoveUp;
@@ -183,7 +183,7 @@ AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b)
       res.bad = InputMethod::MoveDown;
       res.worst = InputMethod::MoveLeft;
     }
-    } else if ((a.x > b.x) && (a.y > b.y)) { // 2nd quarter.
+    } else if ((a.x > b.x) && (a.y >= b.y)) { // 2nd quarter.
     if ((diff.x > 0) && (diff.x < diff.y)) { // Steep eighth.
       res.best = InputMethod::MoveLeft;
       res.good = InputMethod::MoveUp;
