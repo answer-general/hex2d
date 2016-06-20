@@ -5,7 +5,7 @@ LDFLAGS+=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -g
 TARGET=./titovden
 SRCDIR=./src
 
-EXEC=hexed
+EXEC=titovden
 
 SOURCES=$(addprefix src/, \
   ObjectContainer.cpp \
@@ -34,6 +34,10 @@ OBJECTS=$(SOURCES:.cpp=.o)
 all: compile
 
 compile: $(TARGET)/$(EXEC)
+
+doc:
+	mkdir -p $(TARGET)
+	doxygen
 
 $(TARGET)/$(EXEC): $(OBJECTS)
 	mkdir -p $(TARGET)
