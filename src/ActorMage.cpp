@@ -8,7 +8,7 @@
 
 class ActorMage::Private {
 public:
-  static const double defaultSpeed;
+  static const size_t defaultSpeed;
   static const size_t defaultBombRadius;
   static const size_t defaultBombCount;
 
@@ -36,7 +36,7 @@ public:
   Point pos;
 };
 
-const double ActorMage::Private::defaultSpeed = 0.5;
+const size_t ActorMage::Private::defaultSpeed = 1;
 const size_t ActorMage::Private::defaultBombRadius = 2;
 const size_t ActorMage::Private::defaultBombCount = 1;
 

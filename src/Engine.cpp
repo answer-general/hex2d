@@ -75,8 +75,11 @@ void Engine::update() {
 
   for (auto x : ids) {
     auto t = objs->getObject(x);
-    if (!t->alive())
+    if (!t->alive()) {
+      if (t->getId() == d->core.getPCId()) // Oops... Player died.
+        d->core.setPC(GameObject::InvalidObject);
       objs->removeObject(x);
+    }
   }
 
   // Update the rest.
@@ -104,7 +107,7 @@ void Engine::setLevelName(const std::string& s) {
   d->levelName = s;
 }
 
-bool Engine::explode(const Point& start, Point end) {
+bool Engine::explode(Point start, Point end) {
   // Vertical and horizontal lines only.
   if (start.x != end.x && start.y != end.y)
     return false;
@@ -114,40 +117,45 @@ bool Engine::explode(const Point& start, Point end) {
   if (start.x == end.x && start.y <= end.y) { // Down
     xInc = 0;
     yInc = 1;
-    end.y++; // Include end to the range.
   } else if (start.x == end.x && start.y > end.y) { // Up
     xInc = 0;
     yInc = -1;
-    end.y--; // Include end to the range.
   } else if (start.x <= end.x && start.y == end.y) { // Right
     xInc = 1;
     yInc = 0;
-    end.x++; // Include end to the range.
   } else { // Left
     xInc = -1;
     yInc = 0;
-    end.x--; // Include end to the range.
   }
 
   SPtr<Level> level = d->core.getLevel();
   SPtr<ObjectContainer> objs = d->core.getObjects();
 
-  for (Point t = start; t != end; t.x += xInc, t.y += yInc) {
-    // Destroy map cells.
-    if (!level->destroy(t)) // Obstacle found.
+  Point t;
+  for (t = start; t != end; t.x += xInc, t.y += yInc) {
+    if (!level->destroy(t))
       break;
-
-    // Destroy dynamic objects.
-    std::vector<int> dynamic = objs->getIdsAt(t);
-
-    for (auto x : dynamic) {
-      auto obj = objs->getObject(x);
-      obj->kill();
+  }
+  // Include end.
+  if (t == end) {
+    if (!level->destroy(t)) {
+      t.x -= xInc;
+      t.y -= yInc;
     }
-
-    // TODO: Place random bonus.
   }
 
+  std::vector<int> dynamic;
+  if (start < end)
+    dynamic = objs->getIdsIn(start, t);
+  else
+    dynamic = objs->getIdsIn(t, start);
+
+  for (auto x : dynamic) {
+    auto obj = objs->getObject(x);
+    obj->kill();
+  }
+
+  // TODO: Randomly place bonuses.
   return true;
 }
 
@@ -168,7 +176,8 @@ void Engine::Private::setupSingle() {
   player1->move(pos);
 
   objects->addObject(player1);
-  
+  core.setPC(player1->getId());
+
   // TODO: Add NPCs.
 }
 

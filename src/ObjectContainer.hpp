@@ -23,7 +23,9 @@ public:
   SPtr<GameObject> getObject(int id);
 
   std::vector<int> getAllIds() const;
-  std::vector<int> getIdsAt(const Point&) const;
+  std::vector<int> getIdsIn(const Point&, const Point&) const;
+
+  void update();
 private:
   class Private;
   UPtr<Private> d;

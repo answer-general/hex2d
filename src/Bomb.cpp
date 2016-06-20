@@ -23,7 +23,7 @@ public:
   bool alive;
 };
 
-const size_t Bomb::Private::defaultTicks = 20000;
+const size_t Bomb::Private::defaultTicks = 100;
 const size_t Bomb::Private::defaultRadius = 2;
 
 Bomb::Bomb(Game& core, int id) : GameObject(id), d(new Private(core)) {

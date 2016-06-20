@@ -41,6 +41,10 @@ public:
   const SPtr<UI> getUI() const;
 
   SPtr<InputMethod> newKbdInput();
+
+  // Player character.
+  int getPCId() const;
+  void setPC(int);
 private:
   class Private;
   UPtr<Private> d;

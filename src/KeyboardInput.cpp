@@ -32,6 +32,8 @@ void KeyboardInput::update() {
     int in = getch();
     ungetch(in);
 
-    d->lastCmd = conf->getKbdCommand(target, in);
+    auto cmd = conf->getKbdCommand(target, in);
+    if (cmd != InputMethod::NoCommand)
+      d->lastCmd = cmd;
   }
 }
