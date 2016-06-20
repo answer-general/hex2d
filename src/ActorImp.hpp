@@ -65,39 +65,6 @@ public:
    * @param[in] id Enemies identification number
    */
   void onStackWith(int id);
-
-  // Stubs -- don't affect behaviour.
-  /*!
-   * \fn void boostBombCount(int newCount, int durationTicks)
-   * \brief Increase the number of bombs
-   * \public \memberof ActorImp
-   * @param[in] newCount New number of bombs
-   * @param[in] durationTicks Boost's duration
-   */
-  void boostBombCount(int newCount, int durationTicks);
-  /*!
-   * \fn void boostBombRadius(int newVal, int durationTicks);
-   * \brief Boosts bomb's radius
-   * \public \memberof ActorImp
-   * @param[in] newVal New bomb's radius
-   * @param[in] durationTicks Boost's duration
-   */
-  void boostBombRadius(int newVal, int durationTicks);
-  /*!
-   * \fn void boostInvul(int durationTicks)
-   * \brief Makes the character invulnerable to bombs 
-   * \public \memberof ActorImp
-   * @param[in] durationTicks Boost's duration
-   */
-  void boostInvul(int durationTicks);
-  /*!
-   * \fn void boostSpeed(int newVal, int durationTicks)
-   * \brief Accelerate bombs' speed 
-   * \public \memberof ActorImp
-   * @param[in] newVal New speed's value
-   * @param[in] durationTicks Boost's duration
-   */
-  void boostSpeed(int newVal, int durationTicks);
 private:
   class Private;
   UPtr<Private> d;

@@ -59,6 +59,12 @@ enum InputMethod::Command AIInput::getNextCommand() {
 void AIInput::update() {
   Point curr = d->currentPosition();
   Point tgt = d->findNearestTarget();
+  // Target not found, go to middle of the map.
+  if (tgt.x == -1 && tgt.y == -1) {
+    Point tmp = d->core.getLevel()->getSize();
+    tgt.x = tmp.x / 2;
+    tgt.y = tmp.x / 2;
+  }
 
   // Already at goal.
   if (tgt.x == curr.x && tgt.y == curr.y) {
@@ -118,12 +124,14 @@ Point AIInput::Private::findNearestTarget() {
 
   for (auto x : potentialTargets) {
     if (!GameObject::idIsActor(x)) // Quick check.
-      break;
+      continue;
 
     auto tmp = objs->getObject(x);
 
     try { // Is it mage?
-      std::dynamic_pointer_cast<ActorMage>(tmp);
+      auto tmp2 = std::dynamic_pointer_cast<ActorMage>(tmp);
+      if (!tmp2) // No, it isn't
+        continue;
 
       if (tgtId == GameObject::InvalidObject || // First target.
           dist2(pos, tmp->pos() < minDist)) { // .. or better than old one.

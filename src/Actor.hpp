@@ -46,38 +46,6 @@ public:
    * \pure \public \memberof Actor
    */
   virtual void setInputMethod(SPtr<InputMethod> in) { input = in; }
-
-  /*!
-   * \fn virtual void boostBombCount(int newCount, int durationTicks) = 0;
-   * \brief Increase the number of bombs
-   * \pure \public \memberof Actor
-   * @param[in] newCount New number of bombs
-   * @param[in] durationTicks Boost's duration
-   */
-  virtual void boostBombCount(int newCount, int durationTicks) = 0;
-  /*!
-   * \fn virtual void boostBombRadius(int newVal, int durationTicks) = 0;
-   * \brief Boosts bomb's radius
-   * \pure \public \memberof Actor
-   * @param[in] newVal New bomb's radius
-   * @param[in] durationTicks Boost's duration
-  */
-  virtual void boostBombRadius(int newVal, int durationTicks) = 0;
-  /*!
-   * \fn virtual void boostInvul(int durationTicks) = 0;
-   * \brief Makes the character invulnerable to bombs 
-   * \pure \public \memberof Actor
-   * @param[in] durationTicks Boost's duration
-   */
-  virtual void boostInvul(int durationTicks) = 0;
-  /*!
-   * \fn virtual void boostSpeed(int newVal, int durationTicks) = 0;
-   * \brief Accelerate bombs' speed 
-   * \pure \public \memberof Actor
-   * @param[in] newVal New speed's value
-   * @param[in] durationTicks Boost's duration
-   */
-  virtual void boostSpeed(int newVal, int durationTicks) = 0;
 protected:
   SPtr<InputMethod> input;
 };

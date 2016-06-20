@@ -73,14 +73,6 @@ void ActorImp::onStackWith(int id) {
   }
 }
 
-void ActorImp::boostBombCount(int, int) {}
-
-void ActorImp::boostBombRadius(int, int) {}
-
-void ActorImp::boostInvul(int) {}
-
-void ActorImp::boostSpeed(int, int) {}
-
 void ActorImp::Private::onCmdMove(InputMethod::Command cmd) {
   int delta = (speed * (tick++));
   if (delta == 0)

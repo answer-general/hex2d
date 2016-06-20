@@ -1,7 +1,7 @@
 #include "Bonus.hpp"
 #include "GameObject.hpp"
 #include "ObjectContainer.hpp"
-#include "Actor.hpp"
+#include "ActorMage.hpp"
 #include "Game.hpp"
 
 Bonus::Bonus(Game& c, int id, int ticks) : GameObject(c, id),
@@ -33,7 +33,7 @@ void SpeedBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
     return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
-  SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
+  SPtr<ActorMage> act = std::dynamic_pointer_cast<ActorMage>(obj);
   act->boostSpeed(defaultSpeed, ticks);
 
   picker = id;
@@ -56,7 +56,7 @@ void InvulBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
     return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
-  SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
+  SPtr<ActorMage> act = std::dynamic_pointer_cast<ActorMage>(obj);
   act->boostInvul(ticks);
 
   picker = id;
@@ -79,7 +79,7 @@ void BombCountBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
     return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
-  SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
+  SPtr<ActorMage> act = std::dynamic_pointer_cast<ActorMage>(obj);
   act->boostBombCount(defaultCount, ticks);
 
   picker = id;
@@ -102,7 +102,7 @@ void BombRangeBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
     return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
-  SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
+  SPtr<ActorMage> act = std::dynamic_pointer_cast<ActorMage>(obj);
   act->boostBombRadius(defaultRange, ticks);
 
   picker = id;
