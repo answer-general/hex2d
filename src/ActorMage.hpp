@@ -63,7 +63,7 @@ public:
    */
   void onStackWith(int);
 
-  /// Bonus effects -- provide temporary boosts.
+  // Bonus effects -- provide temporary boosts.
   /*!
    * \fn void boostBombCount(int newCount, int durationTicks)
    * \brief Increase the number of bombs
