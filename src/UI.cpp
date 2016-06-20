@@ -51,7 +51,7 @@ UI::UI(Game& g) : d(new Private(g)) {
 
   SPtr<Screen> levelSelectorHS(new LevelSelect(d->game));
   Private::Transition levelSelHotseat = {
-	  UI::Hotseat,
+	  UI::LevelSelSingle,
 	  onLevelHotseatEnter,
 	  onLevelHotseatExit,
 	  levelSelectorHS
@@ -118,7 +118,7 @@ static void onLevelSelSingleExit(void* scr) {
 
 static void onLevelHotseatEnter(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
-  ls->setMode(LevelSelect::HotSeat);
+  ls->setMode(LevelSelect::SinglePlayer);
 }
 static void onLevelHotseatExit(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
