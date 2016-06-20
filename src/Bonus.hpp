@@ -25,9 +25,6 @@ public:
 
   virtual ~Bonus();
 
-  Point pos() const;
-  bool move(const Point&);
-
   bool alive() const;
   bool kill();
  
@@ -36,10 +33,7 @@ public:
   /// /return GameObject::InvalidObject, if not picked.
   virtual int pickedBy() const = 0;
 
-  /// /return false if already picked.
-  virtual bool pickUp(int) = 0;
 protected:
-  Game& core;
   int ticks;
   Point position;
 };
@@ -54,7 +48,7 @@ public:
   ~SpeedBonus();
 
   int pickedBy() const;
-  bool pickUp(int);
+  void onStackWith(int);
 
   int print() const;
 private:
@@ -72,7 +66,7 @@ public:
   ~InvulBonus();
 
   int pickedBy() const;
-  bool pickUp(int);
+  void onStackWith(int);
 
   int print() const;
 private:
@@ -89,7 +83,7 @@ public:
   ~BombCountBonus();
 
   int pickedBy() const;
-  bool pickUp(int);
+  void onStackWith(int);
 
   int print() const;
 private:
@@ -107,7 +101,7 @@ public:
   ~BombRangeBonus();
 
   int pickedBy() const;
-  bool pickUp(int);
+  void onStackWith(int);
 
   int print() const;
 private:

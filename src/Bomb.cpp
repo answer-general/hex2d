@@ -10,44 +10,28 @@ public:
   static const size_t defaultTicks;
   static const size_t defaultRadius;
 
-  Private(Game& c) : core(c), ticks(defaultTicks),
-      radius(defaultRadius), pos(-1,-1), alive(true) {};
+  Private(Bomb& s) : self(s), ticks(defaultTicks),
+      radius(defaultRadius), alive(true) {};
   void detonate();
 
-  Game& core;
+  Bomb& self;
 
   size_t ticks;
   size_t radius;
 
-  Point pos;
   bool alive;
 };
 
 const size_t Bomb::Private::defaultTicks = 100;
 const size_t Bomb::Private::defaultRadius = 2;
 
-Bomb::Bomb(Game& core, int id) : GameObject(id), d(new Private(core)) {
+Bomb::Bomb(Game& core, int id) : GameObject(core, id), d(new Private(*this)) {
 }
 
 Bomb::~Bomb() {}
 
 int Bomb::print() const {
   return 'B';
-}
-
-Point Bomb::pos() const {
-  return d->pos;
-}
-
-bool Bomb::move(const Point& p) {
-  SPtr<Level> l = d->core.getLevel();
-
-  if (d->alive && l->canCross(p)) {
-    d->pos = p;
-    return true;
-  } else {
-    return false;
-  }
 }
 
 bool Bomb::alive() const {
@@ -70,6 +54,8 @@ void Bomb::update() {
   }
 }
 
+void Bomb::onStackWith(int) {}
+
 size_t Bomb::getRadius() const {
   return d->radius;
 }
@@ -79,25 +65,25 @@ void Bomb::setRadius(size_t r) {
 }
 
 void Bomb::Private::detonate() {
-  SPtr<Engine> e = core.getEngine();
+  SPtr<Engine> e = self.core.getEngine();
   Point t;
 
   alive = false; // Prevent recursive detonation.
 
   // Detonate in all directions.
-  t = pos;
+  t = self.position;
   t.y += radius;
-  e->explode(pos, t);
+  e->explode(self.position, t);
 
-  t = pos;
+  t = self.position;
   t.y -= radius;
-  e->explode(pos, t);
+  e->explode(self.position, t);
 
-  t = pos;
+  t = self.position;
   t.x += radius;
-  e->explode(pos, t);
+  e->explode(self.position, t);
 
-  t = pos;
+  t = self.position;
   t.x -= radius;
-  e->explode(pos, t);
+  e->explode(self.position, t);
 }

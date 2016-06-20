@@ -10,7 +10,7 @@ class Game;
 class Actor : public GameObject {
 public:
   // Base constructor for characters' registration
-  Actor(int id) : GameObject(id) {};
+  Actor(Game& core, int id) : GameObject(core, id) {};
 
   // Prohibit copying objects
   Actor(const Actor&) = delete;

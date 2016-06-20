@@ -3,6 +3,8 @@
 
 #include "commons.hpp"
 
+class Game;
+
 class GameObject {
 public:
   // Defines ids for static objects and id ranges for dynamic ones.
@@ -31,7 +33,7 @@ public:
   static int genBombId();
   static int genBonusId();
 
-  GameObject(int id);
+  GameObject(Game& core, int id);
 
   GameObject(const GameObject&) = delete;
   GameObject& operator =(const GameObject&) = delete;
@@ -40,17 +42,23 @@ public:
 
   virtual int getId() const;
 
+  // Called if another object is moved to the same cell with this.
+  virtual void onStackWith(int) = 0;
+
   virtual int print() const = 0;
 
-  virtual Point pos() const = 0;
-  virtual bool move(const Point&) = 0;
+  virtual Point pos() const;
+  virtual bool move(const Point&);
 
   virtual bool alive() const = 0;
   virtual bool kill() = 0;
- 
+
   virtual void update() = 0;
 protected:
+  Game& core;
+
   int id;
+  Point position;
 };
 
 #endif

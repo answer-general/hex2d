@@ -15,13 +15,11 @@ public:
 
   int print() const;
 
-  Point pos() const;
-  bool move(const Point&);
-
   bool alive() const;
   bool kill();
  
   void update();
+  void onStackWith(int);
 
   // Bonus effects -- provide temporary boosts.
   void boostBombCount(int newCount, int durationTicks);

@@ -17,13 +17,11 @@ public:
 
   int print() const;
 
-  Point pos() const;
-  bool move(const Point&);
-
   bool alive() const;
   bool kill();
 
   void update();
+  void onStackWith(int);
 
   size_t getRadius() const;
   void setRadius(size_t);

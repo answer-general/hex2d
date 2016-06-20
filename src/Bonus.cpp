@@ -4,17 +4,10 @@
 #include "Actor.hpp"
 #include "Game.hpp"
 
-Bonus::Bonus(Game& c, int id, int ticks) : GameObject(id),
-    core(c), ticks(ticks), position(-1, -1) {}
+Bonus::Bonus(Game& c, int id, int ticks) : GameObject(c, id),
+    ticks(ticks) {}
 
 Bonus::~Bonus() {}
-
-Point Bonus::pos() const { return position; }
-
-bool Bonus::move(const Point& pos) {
-  position = pos;
-  return true;
-}
 
 bool Bonus::alive() const {
   if (this->pickedBy() == GameObject::InvalidObject)
@@ -36,13 +29,12 @@ int SpeedBonus::pickedBy() const {
   return picker;
 }
 
-bool SpeedBonus::pickUp(int id) {
+void SpeedBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
-    return false;
+    return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostSpeed(defaultSpeed, ticks);
-  return true;
 }
 
 int SpeedBonus::print() const {
@@ -58,13 +50,12 @@ int InvulBonus::pickedBy() const {
   return picker;
 }
 
-bool InvulBonus::pickUp(int id) {
+void InvulBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
-    return false;
+    return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostInvul(ticks);
-  return true;
 }
 
 int InvulBonus::print() const {
@@ -80,13 +71,12 @@ int BombCountBonus::pickedBy() const {
   return picker;
 }
 
-bool BombCountBonus::pickUp(int id) {
+void BombCountBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
-    return false;
+    return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostBombCount(defaultCount, ticks);
-  return true;
 }
 
 int BombCountBonus::print() const {
@@ -102,13 +92,12 @@ int BombRangeBonus::pickedBy() const {
   return picker;
 }
 
-bool BombRangeBonus::pickUp(int id) {
+void BombRangeBonus::onStackWith(int id) {
   if (!GameObject::idIsActor(id))
-    return false;
+    return;
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostBombRadius(defaultRange, ticks);
-  return true;
 }
 
 int BombRangeBonus::print() const {

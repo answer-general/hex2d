@@ -15,13 +15,11 @@ public:
 
   int print() const;
 
-  Point pos() const;
-  bool move(const Point&);
-
   bool alive() const;
   bool kill();
  
   void update();
+  void onStackWith(int id);
 
   // Stubs -- don't affect behaviour.
   // Bonus effects -- provide temporary boosts.

@@ -11,61 +11,24 @@ class ActorImp::Private {
 public:
   static const int defaultSpeed = 1;
 
-  Private(Game& c, ActorImp& s) : core(c), self(s), pos(-1, -1),
-      alive(true), speed(defaultSpeed), tick(0) {};
+  Private(ActorImp& s) : self(s), alive(true),
+      speed(defaultSpeed), tick(0) {};
 
   void onCmdMove(InputMethod::Command cmd);
 
-  Game& core;
   ActorImp& self;
-
-  Point pos;
 
   bool alive;
   int speed;
   int tick;
 };
 
-ActorImp::ActorImp(Game& core, int id) : Actor(id), d(new Private(core, *this)) {}
+ActorImp::ActorImp(Game& core, int id) : Actor(core, id), d(new Private(*this)) {}
 
 ActorImp::~ActorImp() {}
 
 int ActorImp::print() const {
   return '@';
-}
-
-Point ActorImp::pos() const {
-  return d->pos;
-}
-
-bool ActorImp::move(const Point& tgt) {
-  SPtr<Level> l = d->core.getLevel();
-
-  if (d->alive && l->canCross(tgt)) {
-    d->pos = tgt;
-
-    // Are there enemies?
-    SPtr<ObjectContainer> objs = d->core.getObjects();
-    std::vector<int> idsAt = objs->getIdsIn(d->pos, d->pos);
-
-    // Pick all of them up.
-    for (auto x : idsAt) {
-      if (GameObject::idIsActor(x)) {
-        // Kill only mages.
-        try {
-          SPtr<ActorMage> enemy = std::dynamic_pointer_cast<ActorMage>(
-              objs->getObject(x));
-          enemy->kill();
-        } catch (const std::bad_cast&) {};
-      }
-    }
-
-    return true;
-  } else {
-    return false;
-  }
-
-  return true;
 }
 
 bool ActorImp::alive() const {
@@ -98,6 +61,18 @@ void ActorImp::update() {
   }
 }
 
+void ActorImp::onStackWith(int id) {
+  // Kill enemies.
+  if (GameObject::idIsActor(id)) {
+    // Kill only mages.
+    try {
+      SPtr<ActorMage> enemy = std::dynamic_pointer_cast<ActorMage>(
+          core.getObjects()->getObject(id));
+      enemy->kill();
+    } catch (const std::bad_cast&) {}; // Not a mage, ignore.
+  }
+}
+
 void ActorImp::boostBombCount(int, int) {}
 
 void ActorImp::boostBombRadius(int, int) {}
@@ -113,7 +88,7 @@ void ActorImp::Private::onCmdMove(InputMethod::Command cmd) {
   else
     tick = 0;
 
-  Point p = pos;
+  Point p = self.position;
 
   switch (cmd) {
   case InputMethod::MoveUp:

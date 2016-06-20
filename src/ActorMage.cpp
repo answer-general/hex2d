@@ -1,7 +1,6 @@
 #include <vector>
 #include "ActorMage.hpp"
 #include "Bomb.hpp"
-#include "Bonus.hpp"
 #include "Game.hpp"
 #include "InputMethod.hpp"
 #include "ObjectContainer.hpp"
@@ -13,19 +12,18 @@ public:
   static const size_t defaultBombRadius;
   static const size_t defaultBombCount;
 
-  Private(Game& c, ActorMage& self) : core(c), self(self),
+  Private(ActorMage& self) : self(self),
       speed(defaultSpeed), bombRadius(defaultBombRadius),
       bombCount(defaultBombCount), bonusSpeedLeft(0),
       bonusBombRadiusLeft(0), bonusBombCountLeft(0),
       bonusInvulLeft(0), alive(true), mortal(true),
-      bombs(), pos(-1,-1) {};
+      bombs() {};
 
   void checkBombs();
   void checkBoosts();
   void onCmdMove(InputMethod::Command cmd);
   void onCmdPlant();
 
-  Game& core;
   ActorMage& self;
 
   double speed;
@@ -50,41 +48,13 @@ const size_t ActorMage::Private::defaultSpeed = 1;
 const size_t ActorMage::Private::defaultBombRadius = 2;
 const size_t ActorMage::Private::defaultBombCount = 1;
 
-ActorMage::ActorMage(Game& core, int id) : Actor(id),
-    d(new Private(core, *this)) {}
+ActorMage::ActorMage(Game& core, int id) : Actor(core, id),
+    d(new Private(*this)) {}
 
 ActorMage::~ActorMage() {}
 
 int ActorMage::print() const {
   return '$';
-}
-
-Point ActorMage::pos() const {
-  return d->pos;
-}
-
-bool ActorMage::move(const Point& tgt) {
-  SPtr<Level> l = d->core.getLevel();
-
-  if (d->alive && l->canCross(tgt)) {
-    d->pos = tgt;
-
-    // Is there bonus?
-    SPtr<ObjectContainer> objs = d->core.getObjects();
-    std::vector<int> idsAt = objs->getIdsIn(d->pos, d->pos);
-
-    // Pick all of them up.
-    for (auto x : idsAt) {
-      if (GameObject::idIsBonus(x)) {
-        SPtr<Bonus> b = std::dynamic_pointer_cast<Bonus>(objs->getObject(x));
-        b->pickUp(id);
-      }
-    }
-
-    return true;
-  } else {
-    return false;
-  }
 }
 
 bool ActorMage::alive() const {
@@ -122,6 +92,8 @@ void ActorMage::update() {
     }
   }
 }
+
+void ActorMage::onStackWith(int) {}
 
 void ActorMage::boostBombCount(int newCount, int durationTicks) {
   d->bonusBombCountLeft = durationTicks;
@@ -171,7 +143,7 @@ void ActorMage::Private::onCmdMove(InputMethod::Command cmd) {
   else
     tick = 0;
 
-  Point p = pos;
+  Point p = self.position;
 
   switch (cmd) {
   case InputMethod::MoveUp:
@@ -198,10 +170,10 @@ void ActorMage::Private::onCmdPlant() {
   if (bombs.size() >= bombCount)
     return;
 
-  SPtr<Bomb> b(new Bomb(core, GameObject::genBombId()));
+  SPtr<Bomb> b(new Bomb(self.core, GameObject::genBombId()));
   b->setRadius(bombRadius);
-  b->move(pos);
+  b->move(self.position);
 
-  core.getObjects()->addObject(b);
+  self.core.getObjects()->addObject(b);
   bombs.push_back(b);
 }
