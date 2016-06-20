@@ -13,12 +13,20 @@ class AIInput::Private {
 public:
   static const int defaultRadius = 2;
 
+  struct Plan {
+    InputMethod::Command best;
+    InputMethod::Command good;
+    InputMethod::Command bad;
+    InputMethod::Command worst;
+  };
+
   Private(Game& c, AIInput& s) : core(c), self(s),
       lastCommand(InputMethod::NoCommand),
       radius(defaultRadius) {};
   Point currentPosition();
   Point findNearestTarget();
-  bool canMove(Point pos, enum InputMethod::Command direction);
+  Plan getPlan(const Point& a, const Point& b);
+  bool canMove(Point pos, InputMethod::Command dir);
 
   Game& core;
   AIInput& self;
@@ -52,23 +60,22 @@ void AIInput::update() {
   Point curr = d->currentPosition();
   Point tgt = d->findNearestTarget();
 
-  Point diff;
-  diff.x = Abs(tgt.x - curr.x);
-  diff.y = Abs(tgt.y - curr.y);
+  // Already at goal.
+  if (tgt.x == curr.x && tgt.y == curr.y) {
+    d->lastCommand = InputMethod::NoCommand;
+    return;
+  }
 
-  Point inc(0,0);
-  if ((tgt.x - curr.x) > 0)
-    inc.x = 1;
-  else if ((tgt.x - curr.x) < 0)
-    inc.x = -1;
-
-  if ((tgt.y - curr.y) > 0)
-    inc.y = 1;
-  else if ((tgt.y - curr.y) < 0)
-    inc.y = -1;
-
-  // Try optimal direction.
-//  if (diff.x < diff.y)
+  Private::Plan plan = d->getPlan(curr, tgt);
+  if (d->canMove(curr, plan.best)) {
+    d->lastCommand = plan.best;
+  } else if (d->canMove(curr, plan.good)) {
+    d->lastCommand = plan.good;
+  } else if (d->canMove(curr, plan.bad)) {
+    d->lastCommand = plan.bad;
+  } else if (d->canMove(curr, plan.worst)) {
+    d->lastCommand = plan.worst;
+  }
 }
 
 int AIInput::sightRadius() const {
@@ -139,7 +146,68 @@ Point AIInput::Private::findNearestTarget() {
   return res;
 }
 
-bool AIInput::Private::canMove(Point p, enum InputMethod::Command dir) {
+AIInput::Private::Plan AIInput::Private::getPlan(const Point& a, const Point& b) {
+  Plan res;
+
+  Point diff;
+  diff.x = Abs(a.x - b.x);
+  diff.y = Abs(a.y - b.y);
+
+  // Look through all 8 configurations.
+  if ((a.x < b.x) && (a.y > b.y)) { // 1st quarter.
+    if (diff.x < diff.y) { // Steep eighth.
+      res.best = InputMethod::MoveRight;
+      res.good = InputMethod::MoveUp;
+      res.bad = InputMethod::MoveLeft;
+      res.worst = InputMethod::MoveDown;
+    } else { // Slanting eighth.
+      res.best = InputMethod::MoveUp;
+      res.good = InputMethod::MoveRight;
+      res.bad = InputMethod::MoveDown;
+      res.worst = InputMethod::MoveLeft;
+    }
+    } else if ((a.x > b.x) && (a.y > b.y)) { // 2nd quarter.
+    if (diff.x < diff.y) { // Steep eighth.
+      res.best = InputMethod::MoveLeft;
+      res.good = InputMethod::MoveUp;
+      res.bad = InputMethod::MoveRight;
+      res.worst = InputMethod::MoveDown;    
+    } else { // Slanting eighth.
+      res.best = InputMethod::MoveUp;
+      res.good = InputMethod::MoveLeft;
+      res.bad = InputMethod::MoveDown;
+      res.worst = InputMethod::MoveRight;
+    }  
+  } else if ((a.x > b.x) && (a.y < b.y)) { // 3rd quarter.
+    if (diff.x < diff.y) { // Steep eighth.
+      res.best = InputMethod::MoveLeft;
+      res.good = InputMethod::MoveDown;
+      res.bad = InputMethod::MoveRight;
+      res.worst = InputMethod::MoveUp;
+    } else { // Slanting eighth.
+      res.best = InputMethod::MoveDown;
+      res.good = InputMethod::MoveLeft;
+      res.bad = InputMethod::MoveUp;
+      res.worst = InputMethod::MoveRight;
+    }  
+  } else { // 4th quarter.
+    if (diff.x < diff.y) { // Steep eighth.
+      res.best = InputMethod::MoveRight;
+      res.good = InputMethod::MoveDown;
+      res.bad = InputMethod::MoveLeft;
+      res.worst = InputMethod::MoveUp;
+    } else { // Slanting eighth.
+      res.best = InputMethod::MoveDown;
+      res.good = InputMethod::MoveRight;
+      res.bad = InputMethod::MoveUp;
+      res.worst = InputMethod::MoveLeft;
+    }  
+  }
+
+  return res;
+}
+
+bool AIInput::Private::canMove(Point p, enum Command dir) {
   const auto level = core.getLevel();
 
   switch (dir) {
