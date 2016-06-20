@@ -8,6 +8,14 @@ class Game;
 
 class Bonus : public GameObject {
 public:
+  enum BonusType {
+    BonusSpeed,
+    BonusInvul,
+    BonusCount,
+    BonusRange,
+    BonusTypes
+  };
+
   static const int defaultTicks = 200;
 
   Bonus(Game& core, int id, int ticks = defaultTicks);

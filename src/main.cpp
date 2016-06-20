@@ -1,3 +1,4 @@
+#include <ctime>
 #include <ncurses.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@ int main(void) {
 }
 
 void init() {
+  srand(time(NULL));
   initscr();
   keypad(stdscr, true); // Enable functional keys.
   cbreak();

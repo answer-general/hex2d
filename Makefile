@@ -20,6 +20,7 @@ SOURCES=$(addprefix src/, \
   KeyboardInput.cpp \
   GameObject.cpp \
   ActorMage.cpp \
+  ActorImp.cpp \
   Bomb.cpp \
   Bonus.cpp \
   Engine.cpp \

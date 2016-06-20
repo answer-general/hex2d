@@ -50,6 +50,16 @@ void MapView::Private::printDynamic() {
     if (p.x <= portSize.x && p.y <= portSize.y)
       mvwaddch(viewport, p.y, p.x, ch);
   }
+
+  // Redraw PC on top.
+  int tid = core.getPCId();
+  const auto tmp = objects->getObject(tid);
+
+  Point tp = tmp->pos();
+  int ch = tmp->print();
+
+  mvwaddch(viewport, tp.y, tp.x, ch);
+  wmove(viewport, tp.y, tp.x); // Highlight with cursor.
 }
 
 MapView::MapView(Game& core, WINDOW* vp) : d(new Private(core, vp)) {}

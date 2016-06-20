@@ -1,6 +1,9 @@
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include "ActorMage.hpp"
+#include "ActorImp.hpp"
+#include "Bonus.hpp"
 #include "Engine.hpp"
 #include "Game.hpp"
 #include "ObjectContainer.hpp"
@@ -10,6 +13,8 @@
 class Engine::Private {
 public:
   static const enum Engine::Mode defaultMode;
+  static const int bonusChance;
+
   Private(Game& c) : core(c), running(false),
       mode(defaultMode), levelName() {};
 
@@ -17,7 +22,7 @@ public:
   void setupHotseat();
   void setupMulti();
 
-  bool detonateCell(const Point&);
+  void genBonusAt(const Point& start, const Point& end);
 
   Game& core;
 
@@ -28,6 +33,8 @@ public:
 };
 
 const enum Engine::Mode Engine::Private::defaultMode = Engine::ModeSingle;
+// Each bomb generates 4 explosions -> 8%
+const int Engine::Private::bonusChance = 100;//2;
 
 Engine::Engine(Game& core) : d(new Private(core)) {
 }
@@ -155,7 +162,15 @@ bool Engine::explode(Point start, Point end) {
     obj->kill();
   }
 
-  // TODO: Randomly place bonuses.
+
+  // Generate random bonus.
+  if ((rand() % 100) <= d->bonusChance) {
+    if (start < end)
+      d->genBonusAt(start, t);
+    else
+      d->genBonusAt(t, start);
+  }
+
   return true;
 }
 
@@ -164,7 +179,7 @@ void Engine::Private::setupSingle() {
   SPtr<Level> level = core.getLevel();
 
   // Create Player character.
-  SPtr<ActorMage> player1(new ActorMage(core, GameObject::ActorPlayer1));
+  SPtr<ActorMage> player1(new ActorMage(core, GameObject::genActorId()));
 
   // Assign input.
   SPtr<InputMethod> kbdIn = core.newKbdInput();
@@ -178,7 +193,15 @@ void Engine::Private::setupSingle() {
   objects->addObject(player1);
   core.setPC(player1->getId());
 
-  // TODO: Add NPCs.
+  Point badPos(-1,-1);
+  for (Point p = level->nextSpawn(); p != badPos; p = level->nextSpawn()) {
+    SPtr<ActorImp> npc(new ActorImp(core, GameObject::genActorId()));
+    npc->move(p);
+
+    // TODO: Connect AI input.
+
+    objects->addObject(npc);
+  }
 }
 
 void Engine::Private::setupHotseat() {
@@ -187,4 +210,42 @@ void Engine::Private::setupHotseat() {
 
 void Engine::Private::setupMulti() {
 
+}
+
+void Engine::Private::genBonusAt(const Point& start, const Point& end) {
+  // Select random location.
+  Point pos;
+  if (start.y == end.y) { // Horizontal.
+    pos.y = start.y;
+    pos.x = (rand() % (end.x - start.x)) + start.x;
+  } else { // Vertical.
+    pos.x = start.x;
+    pos.y = (rand() % (end.y - start.y)) + start.y;
+  }
+
+  // Create random bonus.
+  SPtr<Bonus> b;
+
+  int type = rand() % Bonus::BonusTypes;
+  switch (type) {
+  case Bonus::BonusSpeed:
+    b.reset(new SpeedBonus(core, GameObject::genBonusId()));
+    break;
+  case Bonus::BonusInvul:
+    b.reset(new InvulBonus(core, GameObject::genBonusId()));
+    break;
+  case Bonus::BonusCount:
+    b.reset(new BombCountBonus(core, GameObject::genBonusId()));
+    break;
+  case Bonus::BonusRange:
+    b.reset(new BombRangeBonus(core, GameObject::genBonusId()));
+    break;
+  default:
+    return;
+    break;
+  };
+  b->move(pos);
+
+  // Add bonus to the map.
+  core.getObjects()->addObject(b);
 }

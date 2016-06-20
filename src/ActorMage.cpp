@@ -1,6 +1,7 @@
 #include <vector>
 #include "ActorMage.hpp"
 #include "Bomb.hpp"
+#include "Bonus.hpp"
 #include "Game.hpp"
 #include "InputMethod.hpp"
 #include "ObjectContainer.hpp"
@@ -67,6 +68,19 @@ bool ActorMage::move(const Point& tgt) {
 
   if (d->alive && l->canCross(tgt)) {
     d->pos = tgt;
+
+    // Is there bonus?
+    SPtr<ObjectContainer> objs = d->core.getObjects();
+    std::vector<int> idsAt = objs->getIdsIn(d->pos, d->pos);
+
+    // Pick all of them up.
+    for (auto x : idsAt) {
+      if (GameObject::idIsBonus(x)) {
+        SPtr<Bonus> b = std::dynamic_pointer_cast<Bonus>(objs->getObject(x));
+        b->pickUp(id);
+      }
+    }
+
     return true;
   } else {
     return false;
