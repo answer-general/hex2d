@@ -6,6 +6,7 @@
 #include "Game.hpp"
 #include "InputMethod.hpp"
 #include "KeyboardInput.hpp"
+#include "AIInput.hpp"
 #include "ObjectContainer.hpp"
 #include "Level.hpp"
 #include "Config.hpp"
@@ -132,6 +133,14 @@ const SPtr<UI> Game::getUI() const {
 
 SPtr<InputMethod> Game::newKbdInput() {
   SPtr<InputMethod> res(new KeyboardInput(*this));
+
+  d->inputs.push_back(res);
+
+  return res;
+}
+
+SPtr<InputMethod> Game::newAIInput() {
+  SPtr<InputMethod> res(new AIInput(*this));
 
   d->inputs.push_back(res);
 

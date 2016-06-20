@@ -41,6 +41,7 @@ public:
   const SPtr<UI> getUI() const;
 
   SPtr<InputMethod> newKbdInput();
+  SPtr<InputMethod> newAIInput();
 
   // Player character.
   int getPCId() const;

@@ -198,7 +198,9 @@ void Engine::Private::setupSingle() {
     SPtr<ActorImp> npc(new ActorImp(core, GameObject::genActorId()));
     npc->move(p);
 
-    // TODO: Connect AI input.
+    SPtr<InputMethod> aiIn = core.newAIInput();
+    aiIn->assign(npc->getId());
+    npc->setInputMethod(aiIn);
 
     objects->addObject(npc);
   }

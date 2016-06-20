@@ -18,6 +18,7 @@ SOURCES=$(addprefix src/, \
   screens/GameScreen.cpp \
   UI.cpp \
   KeyboardInput.cpp \
+  AIInput.cpp \
   GameObject.cpp \
   ActorMage.cpp \
   ActorImp.cpp \
