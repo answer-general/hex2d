@@ -79,11 +79,6 @@ public:
    */
   virtual void boostSpeed(int newVal, int durationTicks) = 0;
 protected:
-  /*!
-   * \var SPtr<InputMethod> input
-   * The input method's type
-   * \protected \memberof Actor
-  */
   SPtr<InputMethod> input;
 };
 
