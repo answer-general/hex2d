@@ -118,7 +118,7 @@ static void onLevelSelSingleExit(void* scr) {
 
 static void onLevelHotseatEnter(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
-  ls->setMode(LevelSelect::HotSeat);
+  ls->setMode(LevelSelect::SinglePlayer);
 }
 static void onLevelHotseatExit(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
