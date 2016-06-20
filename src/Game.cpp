@@ -11,8 +11,6 @@
 #include "Config.hpp"
 #include "UI.hpp"
 
-#include <fstream>
-
 class Game::Private {
 public:
   void handleInput();
@@ -55,8 +53,6 @@ void Game::run() {
   std::chrono::system_clock::time_point curr = std::chrono::system_clock::now();
   std::chrono::milliseconds lag(0);
 
-  std::ofstream of("log.txt");
-
   while (isRunning()) {
     d->handleInput();
 
@@ -67,7 +63,7 @@ void Game::run() {
       lag += std::chrono::duration_cast<std::chrono::milliseconds>(curr - prev);
 
       // Advance simulation to current time.
-      while (lag > d->updateMsec) {
+      while (d->engine->isRunning() && lag > d->updateMsec) {
         d->engine->update();
         lag -= d->updateMsec;
 
@@ -77,7 +73,6 @@ void Game::run() {
       }
 
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    of << std::chrono::duration_cast<std::chrono::milliseconds>(lag).count() << '\n';
     }
 
     // Render current screen.

@@ -52,14 +52,27 @@ void MapView::Private::printDynamic() {
   }
 
   // Redraw PC on top.
-  int tid = core.getPCId();
-  const auto tmp = objects->getObject(tid);
+  try {
+    int tid = core.getPCId();
+    const auto tmp = objects->getObject(tid);
 
-  Point tp = tmp->pos();
-  int ch = tmp->print();
+    Point tp = tmp->pos();
+    int ch = tmp->print();
 
-  mvwaddch(viewport, tp.y, tp.x, ch);
-  wmove(viewport, tp.y, tp.x); // Highlight with cursor.
+    mvwaddch(viewport, tp.y, tp.x, ch);
+    wmove(viewport, tp.y, tp.x); // Highlight with cursor.
+  } catch (const std::out_of_range&) {
+    Point port;
+    getmaxyx(viewport, port.y, port.x);
+    Point field = core.getLevel()->getSize();
+
+    Point pos;
+    pos.x = (port.x < field.x) ? port.x / 2 : field.x / 2;
+    pos.x -= 5; // strlen("Game over") / 2;
+    pos.y = (port.y < field.y) ? port.y / 2 : field.y / 2;
+
+    mvwaddstr(viewport, pos.y, pos.x, "Game over");
+  }; // Character died
 }
 
 MapView::MapView(Game& core, WINDOW* vp) : d(new Private(core, vp)) {}
