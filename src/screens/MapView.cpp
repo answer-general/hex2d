@@ -61,6 +61,17 @@ void MapView::Private::printDynamic() {
 
     mvwaddch(viewport, tp.y, tp.x, ch);
     wmove(viewport, tp.y, tp.x); // Highlight with cursor.
+    
+    if (core.getPlayer2Id() != GameObject::InvalidObject) {
+		  int tid2 = core.getPlayer2Id();
+		  const auto tmp2 = objects->getObject(tid2);
+		  
+		  Point tp2 = tmp2->pos();
+		  int ch2 = tmp2->print();
+		  
+		  mvwaddch(viewport, tp2.y, tp2.x, ch2);
+		  wmove(viewport, tp2.y, tp2.x); // Highlight with cursor.
+	  }
   } catch (const std::out_of_range&) {
     if (core.getPlayer2Id() == GameObject::InvalidObject) {
       Point port;

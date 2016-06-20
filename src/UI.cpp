@@ -12,6 +12,9 @@ typedef void (* callback)(void*);
 static void onLevelSelSingleEnter(void*);
 static void onLevelSelSingleExit(void*);
 
+static void onLevelHotseatEnter(void*);
+static void onLevelHotseatExit(void*);
+
 class UI::Private {
 public:
   Private(Game& g) : game(g) {};
@@ -46,6 +49,14 @@ UI::UI(Game& g) : d(new Private(g)) {
     levelSelector
   };
 
+  SPtr<Screen> levelSelectorHS(new LevelSelect(d->game));
+  Private::Transition levelSelHotseat = {
+	  UI::Hotseat,
+	  onLevelHotseatEnter,
+	  onLevelHotseatExit,
+	  levelSelectorHS
+  };
+
   SPtr<Screen> gameScreen(new GameScreen(d->game));
   Private::Transition singleGame = {
     UI::GameSingle,
@@ -56,6 +67,7 @@ UI::UI(Game& g) : d(new Private(g)) {
 
   d->screens[mainMenu.type] = mainMenu;
   d->screens[levelSelSingle.type] = levelSelSingle;
+  d->screens[levelSelHotseat.type] = levelSelHotseat;
   d->screens[singleGame.type] = singleGame;
 
   d->currentScreen = mainMenu.type;
@@ -100,6 +112,15 @@ static void onLevelSelSingleEnter(void* scr) {
 }
 
 static void onLevelSelSingleExit(void* scr) {
+  LevelSelect* ls = (LevelSelect*)scr;
+  ls->setMode(LevelSelect::DefaultMode);
+}
+
+static void onLevelHotseatEnter(void* scr) {
+  LevelSelect* ls = (LevelSelect*)scr;
+  ls->setMode(LevelSelect::HotSeat);
+}
+static void onLevelHotseatExit(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
   ls->setMode(LevelSelect::DefaultMode);
 }
