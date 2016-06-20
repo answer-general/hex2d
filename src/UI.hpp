@@ -22,7 +22,6 @@ public:
     MainMenuScreen, /*!< Main Menu Screen */
     LevelSelSingle, /*!< Level Selection (Single-play) */
     GameSingle,     /*!< Single Game */
-	Hotseat,		/*!< Hotseat Game */
     ScreensCount,   /*!< Screens count */
     NoScreen        /*!< Signals shutdown */
   };
