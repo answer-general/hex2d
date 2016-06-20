@@ -51,7 +51,7 @@ UI::UI(Game& g) : d(new Private(g)) {
 
   SPtr<Screen> levelSelectorHS(new LevelSelect(d->game));
   Private::Transition levelSelHotseat = {
-	  UI::Hotseat,
+	  UI::LevelSelSingle,
 	  onLevelHotseatEnter,
 	  onLevelHotseatExit,
 	  levelSelectorHS
