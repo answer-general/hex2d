@@ -21,10 +21,10 @@ public:
    * \public \memberof Bonus
    */
   enum BonusType {
-    BonusSpeed, /*!< Accelerate bombs' speed */
+    BonusSpeed, /*!< Accelerate player's speed */
     BonusInvul, /*!< Invulnerable to bombs */
     BonusCount, /*!< Increase the number of bombs */
-    BonusRange,
+    BonusRange, /*!< Increase the bombs' range */
     BonusTypes
   };
   /*!
@@ -111,7 +111,7 @@ public:
   void onStackWith(int);
   /*!
    * \fn int print() const
-   * \brief Returns bomb's icon(letter)
+   * \brief Returns bonus's icon(letter)
    * \public \memberof SpeedBomb
    */
   int print() const;
@@ -156,7 +156,7 @@ public:
   
   /*!
    * \fn int print() const
-   * \brief Returns bomb's icon(letter)
+   * \brief Returns bonus's icon(letter)
    * \public \memberof InvulBomb
    */
   int print() const;
@@ -195,7 +195,7 @@ public:
   void onStackWith(int);
   /*!
    * \fn int print() const
-   * \brief Returns bomb's icon(letter)
+   * \brief Returns bonus's icon(letter)
    * \public \memberof BombCountBonus
    */
   int print() const;
@@ -236,7 +236,7 @@ public:
 
   /*!
    * \fn int print() const
-   * \brief Returns bomb's icon(letter)
+   * \brief Returns bonus's icon(letter)
    * \public \memberof BombRangeBonus
    */
   int print() const;
