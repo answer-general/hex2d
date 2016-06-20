@@ -124,6 +124,11 @@ public:
    * \public \memberof Game
    */
   SPtr<InputMethod> newKbdInput();
+  /*!
+   * \fn SPtr<InputMethod> newAIInput()
+   * Adds & returns new ai input. 
+   * \public \memberof Game
+   */
   SPtr<InputMethod> newAIInput();
 
   // Player character
