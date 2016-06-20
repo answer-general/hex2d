@@ -46,7 +46,6 @@ public:
    * \fn bool kill()
    * \brief Kills player's character
    * \public \memberof ActorMage
-   * 
    */
   bool kill();
   /*!
