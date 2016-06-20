@@ -14,10 +14,13 @@ public:
 
   Private(Game& c, ActorMage& self) : core(c), self(self),
       speed(defaultSpeed), bombRadius(defaultBombRadius),
-      bombCount(defaultBombCount), alive(true), mortal(true),
+      bombCount(defaultBombCount), bonusSpeedLeft(0),
+      bonusBombRadiusLeft(0), bonusBombCountLeft(0),
+      bonusInvulLeft(0), alive(true), mortal(true),
       bombs(), pos(-1,-1) {};
 
   void checkBombs();
+  void checkBoosts();
   void onCmdMove(InputMethod::Command cmd);
   void onCmdPlant();
 
@@ -27,6 +30,12 @@ public:
   double speed;
   size_t bombRadius;
   size_t bombCount;
+
+  // Counters for bonuses.
+  int bonusSpeedLeft;
+  int bonusBombRadiusLeft;
+  int bonusBombCountLeft;
+  int bonusInvulLeft;
 
   bool alive;
   bool mortal;
@@ -79,6 +88,7 @@ bool ActorMage::kill() {
  
 void ActorMage::update() {
   d->checkBombs();
+  d->checkBoosts();
 
   if (input) {
     InputMethod::Command cmd = input->getNextCommand();
@@ -99,6 +109,26 @@ void ActorMage::update() {
   }
 }
 
+void ActorMage::boostBombCount(int newCount, int durationTicks) {
+  d->bonusBombCountLeft = durationTicks;
+  d->bombCount = newCount;
+}
+
+void ActorMage::boostBombRadius(int newVal, int durationTicks) {
+  d->bonusBombRadiusLeft = durationTicks;
+  d->bombRadius = newVal;
+}
+
+void ActorMage::boostInvul(int durationTicks) {
+  d->bonusInvulLeft = durationTicks;
+  d->mortal = false;
+}
+
+void ActorMage::boostSpeed(int newVal, int durationTicks) {
+  d->bonusSpeedLeft = durationTicks;
+  d->speed = newVal;
+}
+
 void ActorMage::Private::checkBombs() {
   for (auto it = bombs.begin(); it != bombs.end(); ++it) {
     if (!((*it)->alive())) {
@@ -107,6 +137,17 @@ void ActorMage::Private::checkBombs() {
         break;
     }
   }
+}
+
+void ActorMage::Private::checkBoosts() {
+  if (--bonusBombCountLeft == 0)
+    bombCount = defaultBombCount;
+  if (--bonusBombRadiusLeft == 0)
+    bombRadius = defaultBombRadius;
+  if (--bonusInvulLeft == 0)
+    mortal = true;
+  if (--bonusSpeedLeft == 0)
+    speed = defaultSpeed;
 }
 
 void ActorMage::Private::onCmdMove(InputMethod::Command cmd) {
@@ -140,7 +181,7 @@ void ActorMage::Private::onCmdMove(InputMethod::Command cmd) {
 }
 
 void ActorMage::Private::onCmdPlant() {
-  if (bombs.size() == bombCount)
+  if (bombs.size() >= bombCount)
     return;
 
   SPtr<Bomb> b(new Bomb(core, GameObject::genBombId()));

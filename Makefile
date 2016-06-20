@@ -21,6 +21,7 @@ SOURCES=$(addprefix src/, \
   GameObject.cpp \
   ActorMage.cpp \
   Bomb.cpp \
+  Bonus.cpp \
   Engine.cpp \
   Game.cpp \
   BSDSocket.cpp \

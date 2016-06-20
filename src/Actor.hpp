@@ -22,8 +22,11 @@ public:
 
   virtual void setInputMethod(SPtr<InputMethod> in) { input = in; }
 
-  // Property modificators for bonuses.
-  
+  // Bonus effects -- provide temporary boosts.
+  virtual void boostBombCount(int newCount, int durationTicks) = 0;
+  virtual void boostBombRadius(int newVal, int durationTicks) = 0;
+  virtual void boostInvul(int durationTicks) = 0;
+  virtual void boostSpeed(int newVal, int durationTicks) = 0;
 protected:
   SPtr<InputMethod> input;
 };

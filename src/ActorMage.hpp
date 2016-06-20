@@ -22,6 +22,12 @@ public:
   bool kill();
  
   void update();
+
+  // Bonus effects -- provide temporary boosts.
+  void boostBombCount(int newCount, int durationTicks);
+  void boostBombRadius(int newVal, int durationTicks);
+  void boostInvul(int durationTicks);
+  void boostSpeed(int newVal, int durationTicks);
 private:
   class Private;
   UPtr<Private> d;
