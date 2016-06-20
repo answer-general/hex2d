@@ -35,6 +35,8 @@ void SpeedBonus::onStackWith(int id) {
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostSpeed(defaultSpeed, ticks);
+
+  picker = id;
 }
 
 int SpeedBonus::print() const {
@@ -56,6 +58,8 @@ void InvulBonus::onStackWith(int id) {
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostInvul(ticks);
+
+  picker = id;
 }
 
 int InvulBonus::print() const {
@@ -77,6 +81,8 @@ void BombCountBonus::onStackWith(int id) {
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostBombCount(defaultCount, ticks);
+
+  picker = id;
 }
 
 int BombCountBonus::print() const {
@@ -98,6 +104,8 @@ void BombRangeBonus::onStackWith(int id) {
   SPtr<GameObject> obj = core.getObjects()->getObject(id);
   SPtr<Actor> act = std::dynamic_pointer_cast<Actor>(obj);
   act->boostBombRadius(defaultRange, ticks);
+
+  picker = id;
 }
 
 int BombRangeBonus::print() const {
