@@ -10,7 +10,7 @@
 class Game;
 /*!
  * \class Bomb
- * \brief Bomb info
+ * \brief Bomb's description
  * Keeps all information about bomb
  */
 class Bomb : public GameObject {
