@@ -20,6 +20,7 @@ public:
    * Base constructor for characters' registration
    * @param[in]  core Reference to the game core.
    * @param[in]  id  Character's identification number
+   * \public \memberof Actor
    */
   Actor(Game& core, int id) : GameObject(core, id) {};
 
