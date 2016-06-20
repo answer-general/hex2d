@@ -87,6 +87,10 @@ void LevelSelect::Private::selectItem(int idx) {
       e->setMode(Engine::ModeSingle);
       e->run();
       core.getUI()->switchScreen(UI::GameSingle);
+    } else if (mode == HotSeat) {
+      e->setMode(Engine::ModeHotseat);
+      e->run();
+      core.getUI()->switchScreen(UI::GameHotseat);
     }
   }
 }

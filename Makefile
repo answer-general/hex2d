@@ -1,8 +1,7 @@
 CXX=g++
-CXXFLAGS+=-Wall -pedantic -Wno-long-long -O0 -std=c++11 -g
-LDFLAGS+=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -g
+CXXFLAGS+=-Wall -pedantic -Wno-long-long -O0 -std=c++11 -ggdb
+LDFLAGS+=-O0 -std=c++11 `pkg-config --libs ncurses menu panel` -ggdb
 
-TARGET=./titovden
 SRCDIR=./src
 
 EXEC=titovden
@@ -33,24 +32,28 @@ OBJECTS=$(SOURCES:.cpp=.o)
 
 all: compile
 
-compile: $(TARGET)/$(EXEC)
+compile: $(EXEC)
 
 doc:
-	mkdir -p $(TARGET)
+	mkdir -p ./doc
+	cp $(SRCDIR)/doc/*.png ./doc/
 	doxygen
 
 install:
 	mkdir -p $$HOME/.config/HexedMan
 	cp -r $(SRCDIR)/assets/* $$HOME/.config/HexedMan/
 
-$(TARGET)/$(EXEC): $(OBJECTS)
-	mkdir -p $(TARGET)
-	$(CXX) $(OBJECTS) -o $(TARGET)/$(EXEC) $(LDFLAGS)
+run: compile
+	./titovden
+
+$(EXEC): $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(EXEC) $(LDFLAGS)
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY clean:
-	rm -rf $(TARGET)
 	rm -f $(SRCDIR)/*.o
 	rm -f $(SRCDIR)/screens/*.o
+	rm -rf ./doc
+	rm -rf $(EXEC)

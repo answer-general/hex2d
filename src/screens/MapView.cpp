@@ -8,12 +8,13 @@
 
 class MapView::Private {
 public:
-  Private(Game& c, WINDOW* vp) : core(c), viewport(vp) {};
+  Private(Game& c, WINDOW* vp) : core(c), actor(0), viewport(vp) {};
 
   void printLevelMap();
   void printDynamic();
 
   Game& core;
+  int actor;
   WINDOW* viewport;
 };
 
@@ -51,53 +52,51 @@ void MapView::Private::printDynamic() {
       mvwaddch(viewport, p.y, p.x, ch);
   }
 
-  // Redraw PC on top.
+  // Redraw actor on top.
   try {
-    int tid = core.getPlayer1Id();
-    const auto tmp = objects->getObject(tid);
+    const auto tmp = objects->getObject(actor);
 
     Point tp = tmp->pos();
     int ch = tmp->print();
 
     mvwaddch(viewport, tp.y, tp.x, ch);
     wmove(viewport, tp.y, tp.x); // Highlight with cursor.
-    
-    if (core.getPlayer2Id() != GameObject::InvalidObject) {
-		  int tid2 = core.getPlayer2Id();
-		  const auto tmp2 = objects->getObject(tid2);
-		  
-		  Point tp2 = tmp2->pos();
-		  int ch2 = tmp2->print();
-		  
-		  mvwaddch(viewport, tp2.y, tp2.x, ch2);
-		  wmove(viewport, tp2.y, tp2.x); // Highlight with cursor.
-	  }
-  } catch (const std::out_of_range&) {
-    if (core.getPlayer2Id() == GameObject::InvalidObject) {
-      Point port;
-      getmaxyx(viewport, port.y, port.x);
-      Point field = core.getLevel()->getSize();
+  } catch (const std::out_of_range&) { // Actor destroyed.
+    Point port;
+    getmaxyx(viewport, port.y, port.x);
+    Point field = core.getLevel()->getSize();
 
-      Point pos;
-      pos.x = (port.x < field.x) ? port.x / 2 : field.x / 2;
-      pos.x -= 5; // strlen("Game over") / 2;
-      pos.y = (port.y < field.y) ? port.y / 2 : field.y / 2;
+    Point pos;
+    pos.x = (port.x < field.x) ? port.x / 2 : field.x / 2;
+    pos.x -= 5; // strlen("Game over") / 2;
+    pos.y = (port.y < field.y) ? port.y / 2 : field.y / 2;
 
-      mvwaddstr(viewport, pos.y, pos.x, "Game over");
-    }
-  }; // Both characters died
+    mvwaddstr(viewport, pos.y, pos.x, "Game over");
+  }
 }
 
 MapView::MapView(Game& core, WINDOW* vp) : d(new Private(core, vp)) {}
 
-MapView::~MapView() {}
+MapView::~MapView() {
+  delwin(d->viewport);
+}
 
 void MapView::setViewport(WINDOW* vp) {
+  delwin(d->viewport);
   d->viewport = vp;
+}
+
+int MapView::getActor() const {
+  return d->actor;
+}
+
+void MapView::setActor(int id) {
+  d->actor = id;
 }
 
 void MapView::update() {
   if (d->viewport) {
+    wclear(d->viewport);
     d->printLevelMap();
     d->printDynamic();
     wnoutrefresh(d->viewport);

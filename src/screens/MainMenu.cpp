@@ -14,7 +14,7 @@ public:
   void createMenu();
   void selectItem(int);
 
-  static const size_t titlesSize = 6;
+  static const size_t titlesSize = 5;//6;
   static const std::array<const std::string, titlesSize> titles;
 
   Game& core;
@@ -33,7 +33,7 @@ const std::array<const std::string, MainMenu::Private::titlesSize>
   std::string("Hot seat"),
   std::string("Host networked game"),
   std::string("Connect to networked game"),
-  std::string("Settings"),
+//  std::string("Settings"),
   std::string("Exit")
 };
 
@@ -66,6 +66,8 @@ void MainMenu::Private::createMenu() {
 void MainMenu::Private::selectItem(int idx) {
   if (titles[idx] == "Single player") {
     core.getUI()->switchScreen(UI::LevelSelSingle);
+  } else if (titles[idx] == "Hot seat") {
+    core.getUI()->switchScreen(UI::LevelSelHotseat);
   } else if (titles[idx] == "Exit") {
     core.getUI()->switchScreen(UI::NoScreen);
   }

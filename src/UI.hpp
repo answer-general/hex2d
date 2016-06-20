@@ -21,7 +21,9 @@ public:
   enum ScreenType {
     MainMenuScreen, /*!< Main Menu Screen */
     LevelSelSingle, /*!< Level Selection (Single-play) */
+    LevelSelHotseat,/*!< Level Selection (Hot seat) */
     GameSingle,     /*!< Single Game */
+    GameHotseat,    /*!< Hot seat game */
     ScreensCount,   /*!< Screens count */
     NoScreen        /*!< Signals shutdown */
   };

@@ -49,12 +49,11 @@ UI::UI(Game& g) : d(new Private(g)) {
     levelSelector
   };
 
-  SPtr<Screen> levelSelectorHS(new LevelSelect(d->game));
   Private::Transition levelSelHotseat = {
-	  UI::LevelSelSingle,
+	  UI::LevelSelHotseat,
 	  onLevelHotseatEnter,
 	  onLevelHotseatExit,
-	  levelSelectorHS
+	  levelSelector
   };
 
   SPtr<Screen> gameScreen(new GameScreen(d->game));
@@ -65,10 +64,18 @@ UI::UI(Game& g) : d(new Private(g)) {
     gameScreen
   };
 
+  Private::Transition hotseatGame = {
+    UI::GameHotseat,
+    nullptr,
+    nullptr,
+    gameScreen
+  };
+
   d->screens[mainMenu.type] = mainMenu;
   d->screens[levelSelSingle.type] = levelSelSingle;
   d->screens[levelSelHotseat.type] = levelSelHotseat;
   d->screens[singleGame.type] = singleGame;
+  d->screens[hotseatGame.type] = hotseatGame;
 
   d->currentScreen = mainMenu.type;
 
@@ -118,7 +125,7 @@ static void onLevelSelSingleExit(void* scr) {
 
 static void onLevelHotseatEnter(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;
-  ls->setMode(LevelSelect::SinglePlayer);
+  ls->setMode(LevelSelect::HotSeat);
 }
 static void onLevelHotseatExit(void* scr) {
   LevelSelect* ls = (LevelSelect*)scr;

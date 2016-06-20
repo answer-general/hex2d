@@ -17,6 +17,9 @@ public:
 
   void setViewport(WINDOW* viewport);
 
+  int getActor() const;
+  void setActor(int);
+
   void update();
 private:
   class Private;
